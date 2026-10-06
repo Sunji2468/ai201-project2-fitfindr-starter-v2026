@@ -323,8 +323,8 @@ OK
 These checks cover size boundaries, price filtering, empty searches, ranking
 and ties, result limits, empty-outfit handling without a model call, blank
 model responses, and model failure propagation. They are tool-level checks,
-not Unit 4 acceptance evaluations. Milestone 3's user-authored criteria are
-still pending.
+not Unit 4 acceptance evaluations. The acceptance criteria were drafted later, after these development checks;
+see the authorship and timing note in `criteria.md`.
 
 ---
 
@@ -359,11 +359,11 @@ Keep this repository and its commit history for both units.
 
 - The three standalone tools, their contracts, and their terminal checks are recorded above.
 - Four new commits already followed starter commit `69997cf`: `c05b1e6`, `1073006`, `ec10b20`, and `9863686`. The Milestone 5 completion adds another commit; the original history is preserved.
-- `criteria.md` exists, but criteria 3–5 and all five target explanations are unfinished. The assignment asks the student to author these; Codex has not filled them in.
+- `criteria.md` now has five measurable criteria and five target explanations. At my explicit request, Codex drafted criteria 3–5 and the explanations after development checks. This differs from the assignment’s student-authorship and before-testing instructions; the timing is disclosed in that file.
 - Milestone 5 is now complete: the loop and query parser are implemented, both branches were checked, and real sample output and session evidence are recorded. Codex implemented this after I supplied the full assignment, including the previously skipped Milestone 5 instructions.
 - The fork URL is saved here. Submission to the course portal has not been performed or verified.
 
-The repository is not yet ready to claim all Unit 3 requirements are complete.
+The implementation and write-up are present. The criteria authorship/timing departure above remains disclosed, and course-portal submission still needs confirmation.
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 

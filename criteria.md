@@ -1,21 +1,18 @@
 # Acceptance criteria — FitFindr
 
-Five criteria that say what "working" means for this agent, written in unit 3
-**before** any results existed.
+Five criteria defining what “working” means for the agent.
 
-An acceptance criterion names a target: a number, a count, a rate, or something
-a person could plainly observe. *"The agent handles errors"* is an opinion.
-*"When search returns nothing, the agent stops before calling the second tool,
-in 5 of 5 tries"* is a criterion.
+**Authorship and timing:** Criteria 1–2 came from the starter. At the student's
+request, Codex drafted criteria 3–5 and all five explanations after the
+standalone tool checks and Milestone 5 development runs. These targets precede
+the Unit 4 acceptance evaluation, but were not written before all results
+existed. The original commit history is preserved.
 
-Under each one, write a sentence or two on **why that target** and not a
-stricter one. A reason that says something about your tools, your loop, or the
-data earns credit; *"80% seemed reasonable"* does not.
-
-> Missing your own targets next unit costs you nothing. Setting a target so
-> easy you can't miss it does.
-
-**Two are written for you. You write three.**
+For evaluation, run each criterion's specified input five times with response
+caching disabled and `TEMPERATURE` unchanged at `0.9`. Each try must satisfy
+all conditions in its criterion to pass; an exception or missing required
+output counts as a failure. Observe real tool calls with wrappers or tracing
+without replacing their return values. Do not lower targets after testing.
 
 ---
 
@@ -24,10 +21,16 @@ data earns credit; *"80% seemed reasonable"* does not.
 Given a query that matches at least one listing, the agent completes all three
 tool calls and returns a fit card — in at least 4 of 5 tries.
 
-**Why this target:**
-<!-- Why 4 of 5 and not 5 of 5? Something about your search, probably —
-     "my search is a plain keyword match and some phrasings will miss" is a
-     real answer. -->
+**Test input and observation:** Use `vintage graphic tee under $30, size M`
+with the example wardrobe. Confirm `search_listings`, `suggest_outfit`, and
+`create_fit_card` run in that order, `session["error"]` is `None`, and
+`session["fit_card"]` contains a caption rather than an empty-case message.
+Caption quality is checked separately in criterion 4.
+
+**Why this target:** This path depends on two live model responses, so one
+service or generation failure is allowed while successful completion must
+still be the usual outcome. Requiring 5 of 5 would treat a transient external
+failure the same as a consistently broken loop.
 
 ---
 
@@ -36,67 +39,73 @@ tool calls and returns a fit card — in at least 4 of 5 tries.
 Given a query that matches no listings, the agent stops before calling
 `suggest_outfit` and returns a message naming what to change — 5 of 5 tries.
 
-**Why this target:**
-<!-- Why is 5 of 5 reasonable here when criterion 1 isn't? What's different
-     about this path? -->
+**Test input and observation:** Use `designer ballgown size XXS under $5`
+with the example wardrobe. Confirm `search_results` is `[]`, neither
+`suggest_outfit` nor `create_fit_card` is called, and `fit_card` stays `None`.
+The error message must suggest changing keywords, size, or the price limit;
+“No results” alone does not pass.
+
+**Why this target:** This branch uses local data and a deterministic condition,
+so model variability cannot explain a miss. Five of five is the strictest
+possible target for five tries, and calling a model with no selected item is
+an avoidable control-flow bug.
 
 ---
 
-## 3. Something about state
+## 3. The selected listing stays consistent across tool calls
 
-<!-- YOU WRITE THIS ONE.
+For `vintage graphic tee under $30, size M` with the example wardrobe, the
+complete listing dictionary in `session["search_results"][0]` must equal
+`session["selected_item"]` and the `new_item` argument received by both
+`suggest_outfit` and `create_fit_card`; the `outfit` argument received by
+`create_fit_card` must equal `session["outfit_suggestion"]` — in 5 of 5 tries.
+Both downstream calls must occur for a try to pass, and comparing only item
+names or IDs is not sufficient.
 
-     How would you know that the item your search found is the same item the
-     next tool received? Name something countable or observable.
-
-     This is the criterion people find hardest, because state failure doesn't
-     look like state failure — it looks like a tool problem. Something that
-     compares session["selected_item"] against what actually reached
-     suggest_outfit is the shape you're after. -->
-
-
-
-**Why this target:**
-
-
+**Why this target:** Passing stored values between functions is deterministic,
+even when the generated words vary. Five of five is the maximum target and
+is necessary because a caption for a different item could display the wrong
+price or platform without producing an obvious error.
 
 ---
 
-## 4. Something about the fit card
+## 4. The fit card is short and preserves the listing facts
 
-<!-- YOU WRITE THIS ONE.
+For `vintage graphic tee under $30, size M` with the example wardrobe, the
+returned fit card must contain two to four sentences, name the selected item
+by its full title exactly once, include its correct dollar price exactly once,
+and name its platform exactly once — in at least 4 of 5 tries. It must also
+mention at least one wardrobe piece used in the outfit suggestion and must
+not invent a brand, discount, or exclusive availability.
 
-     The fit card calls a model, so the same input can produce different words
-     each time. That's not a bug — it's the nature of the tool. So what would
-     make it acceptable?
+**Test interpretation:** Count item titles and platform names without regard
+to letter case. `$18`, `$18.0`, and `$18.00` are equivalent prices; decimal
+points do not split sentences. Check wardrobe references by the named piece,
+allowing capitalization differences. Wording may vary between tries; it need
+not match a saved caption. Missing captions and fallback messages fail.
 
-     Think about what you'd actually be unhappy to see. A caption that never
-     mentions the price? Two different items producing the same opening
-     sentence? A card longer than a caption anyone would post? Any of those can
-     be turned into a number. -->
-
-
-
-**Why this target:**
-
-
+**Why this target:** The model can vary its phrasing and occasionally miss a
+formatting or factual constraint, so 4 of 5 allows one miss without accepting
+unreliable captions as normal. Requiring exact repeated wording would punish
+useful variation; the target instead holds the length and facts steady.
 
 ---
 
-## 5. Your choice
+## 5. An empty wardrobe receives useful advice without invented ownership
 
-<!-- YOU WRITE THIS ONE TOO.
+For `vintage graphic tee under $30, size M` with `{"items": []}`, the agent
+must return a non-empty outfit suggestion that explicitly says no wardrobe
+items were supplied and proposes at least one other clothing or accessory
+piece with a color or style reason for pairing it with the selected listing;
+it must also return a non-empty fit card — in at least 4 of 5 tries. Neither
+output may describe a suggested piece as already owned by the user, and
+fallback or error messages do not count as advice or a fit card.
 
-     Pick something you actually care about getting right. Speed, the empty
-     wardrobe path, what happens when the model can't be reached, whether the
-     search respects a price ceiling — anything, as long as it names a number
-     or an observable outcome. -->
-
-
-
-**Why this target:**
-
-
+**Why this target:** A new user should receive concrete help before entering
+a wardrobe, but both the advice and caption depend on model-generated prose.
+Four of five requires dependable usefulness while allowing one generation
+that is too vague or incorrectly implies ownership; 5 of 5 would allow no
+such model variation.
 
 ---
 
