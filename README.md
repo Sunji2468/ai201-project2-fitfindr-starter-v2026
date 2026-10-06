@@ -37,6 +37,57 @@
 
 <!-- ═══════════════════════ UNIT 3 — THE BUILD ═══════════════════════ -->
 
+## Milestone 1 — Data Review and Starter Run
+
+Reviewed the six complete records `lst_001` through `lst_006`: Levi's jeans,
+butterfly baby tee, oversized flannel, track jacket, corduroy pants, and
+bootleg-style graphic tee.
+
+Listing field names:
+
+- `id`, `title`, `description`, `category`
+- `style_tags`, `size`, `condition`, `price`
+- `colors`, `brand`, `platform`
+
+Three fields to remember are `category`, `size`, and `price`. `price` is
+numeric; `colors` and `style_tags` are lists of strings. `brand` can be
+`null`. Sizes are strings with mixed formats, such as `W30 L30`, `S/M`, and
+`XL (oversized)`, so size filtering needs to account for the actual text.
+Fit details can appear in the description: the baby tee's tag says medium
+but it fits like a small. There is no separate fit or measurements field.
+
+Among these six records, the $18 baby tee and $24 graphic tee both have
+`vintage` and `graphic tee` style tags and are below $30. This is a data
+observation for the sample query; search is not implemented yet.
+
+The wardrobe passed to `suggest_outfit` is a dictionary with an `items`
+list. Each item has `id`, `name`, `category`, `colors`, `style_tags`, and
+optional `notes`; the example includes `null` notes. The example wardrobe
+contains 10 items. An empty wardrobe returned by the data loader is
+`{"items": []}`. The JSON template also has a documentation-only `_note`
+that the loader removes.
+
+Ran these commands in the project's virtual environment:
+
+```bash
+python app.py fields
+python app.py listings --full -n 6
+python app.py examples
+python app.py ask 'vintage graphic tee under $30'
+```
+
+The starter query exited successfully and printed:
+
+```text
+  The planning loop isn't built yet — see the TODO in agent.py.
+
+0 model calls this session
+```
+
+This is the expected starting behavior for Milestone 1.
+
+---
+
 ## What This Does
 
 <!-- Three or four sentences: what a user asks for, and what they get back. -->
