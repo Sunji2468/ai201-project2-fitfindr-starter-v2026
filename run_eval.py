@@ -29,6 +29,13 @@ mode — caching is what usually explains it.
 """
 
 import argparse
+import copy
+import functools
+import inspect
+import json
+from contextlib import ExitStack
+from unittest.mock import patch
+from zoneinfo import ZoneInfo
 import datetime as dt
 import sys
 import traceback
@@ -39,7 +46,8 @@ import scenarios as scenario_module
 
 def run_once(scenario, use_trace=True):
     """One scenario, one try. Returns everything worth recording."""
-    from agent import run_agent
+    import agent
+    import generate
     from utils.data_loader import get_example_wardrobe, get_empty_wardrobe
     import trace as trace_module
 
@@ -50,9 +58,29 @@ def run_once(scenario, use_trace=True):
     if use_trace:
         trace_module.start_trace()
 
-    record = {"error": None, "session": None, "trace": "", "crashed": None}
+    record = {"error": None, "session": None, "trace": "", "crashed": None, "calls": []}
+    calls_before = generate.call_count()
+    tokens_before = generate.token_counts()
+
+    def observe(name, function):
+        @functools.wraps(function)
+        def wrapped(*args, **kwargs):
+            arguments = inspect.signature(function).bind(*args, **kwargs).arguments
+            call = {"name": name, "arguments": copy.deepcopy(dict(arguments))}
+            record["calls"].append(call)
+            result = function(*args, **kwargs)
+            call["returned"] = copy.deepcopy(result)
+            return result
+        return wrapped
     try:
-        record["session"] = run_agent(scenario["query"], wardrobe)
+        with ExitStack() as stack:
+            for owner, attribute, name in [
+                (agent.mcp_client, "call_tool", "search_listings (via MCP)"),
+                (agent, "suggest_outfit", "suggest_outfit"),
+                (agent, "create_fit_card", "create_fit_card"),
+            ]:
+                stack.enter_context(patch.object(owner, attribute, observe(name, getattr(owner, attribute))))
+            record["session"] = agent.run_agent(scenario["query"], wardrobe, use_trace=use_trace)
     except Exception as exc:  # noqa: BLE001 — a crash is a result worth logging
         record["crashed"] = f"{type(exc).__name__}: {exc}"
         record["traceback"] = traceback.format_exc()
@@ -60,6 +88,9 @@ def run_once(scenario, use_trace=True):
     if use_trace:
         record["trace"] = trace_module.get_trace()
 
+    record["model_calls"] = generate.call_count() - calls_before
+    record["tokens"] = {key: value - tokens_before[key] for key, value in generate.token_counts().items()}
+    record["cache_enabled"] = config.CACHE_ENABLED
     return record
 
 
@@ -116,7 +147,8 @@ def main():
 
 def write_report(rows, args):
     config.RESULTS_DIR.mkdir(exist_ok=True)
-    stamp = dt.datetime.now().strftime("%Y-%m-%d_%H%M")
+    now = dt.datetime.now(ZoneInfo("America/New_York"))
+    stamp = now.strftime("%Y-%m-%d_%H%M%S")
     label = f"_{args.label}" if args.label else ""
     path = config.RESULTS_DIR / f"run_{stamp}{label}.md"
 
@@ -131,7 +163,7 @@ def write_report(rows, args):
         "- Loop: `agent.py::run_agent` · tools: `tools.py`",
         f"- Tries per scenario: {n}, caching off",
         f"- Temperature: {config.TEMPERATURE}",
-        f"- When: {dt.datetime.now().strftime('%Y-%m-%d %H:%M')}",
+        f"- When: {now.strftime('%Y-%m-%d %H:%M:%S %Z')}",
         "",
         "Paste the table below into your README. Fill in the Criterion and",
         "Target columns from `criteria.md`, then mark each try PASS or FAIL",
@@ -202,6 +234,10 @@ def write_report(rows, args):
                 lines += ["Trace:", "", "```", record["trace"], "```", ""]
 
     path.write_text("\n".join(lines), encoding="utf-8")
+    path.with_suffix(".json").write_text(json.dumps({
+        "label": args.label, "when": now.isoformat(), "temperature": config.TEMPERATURE,
+        "cache_enabled": config.CACHE_ENABLED, "rows": rows,
+    }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     import generate
 

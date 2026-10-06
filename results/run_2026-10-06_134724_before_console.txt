@@ -1,0 +1,411 @@
+Cache is OFF for this run — that's deliberate.
+
+Full three-tool run returns a fit card  (example wardrobe)
+  query: vintage graphic tee under $30, size M
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: **Outfit 1:** *   Y2K Baby Tee — Butterfly Print *   Baggy straight-leg jeans, dark wash *   Chunky white snea…
+      →    wardrobe items: 10
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Embrace classic Y2K street style with this super cute butterfly print baby tee, listed for $18.00 on depop. Pa…
+  try 1: completed — fit card 228 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: **Outfit 1: Y2K Streetwear** Pair the Y2K Baby Tee — Butterfly Print with Baggy straight-leg jeans, dark wash,…
+      →    wardrobe items: 10
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Channel your inner early 2000s energy with the Y2K Baby Tee — Butterfly Print, featuring playful pink and purp…
+  try 2: completed — fit card 254 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Outfit 1: Pair the Y2K Baby Tee — Butterfly Print with Baggy straight-leg jeans, dark wash, and chunky white s…
+      →    wardrobe items: 10
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Channel effortless Y2K streetwear proportions by pairing the Y2K Baby Tee — Butterfly Print with baggy dark wa…
+  try 3: completed — fit card 273 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Outfit 1: Pair the Y2K Baby Tee — Butterfly Print with the Baggy straight-leg jeans, dark wash, Chunky white s…
+      →    wardrobe items: 10
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Embrace authentic Y2K streetwear by pairing this adorable butterfly print baby tee with baggy dark denim and c…
+  try 4: completed — fit card 190 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: **Y2K Streetwear Look** * Pair the Y2K Baby Tee — Butterfly Print with the Baggy straight-leg jeans, dark wash…
+      →    wardrobe items: 10
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Channel classic Y2K streetwear by styling this sweet Y2K Baby Tee — Butterfly Print with baggy dark-wash jeans…
+  try 5: completed — fit card 286 chars
+
+Empty search stops before model tools  (example wardrobe)
+  query: designer ballgown size XXS under $5
+[1] parse_query
+      in:  designer ballgown size XXS under $5
+      out: {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+      out: [] (empty)
+      →    branch: empty search; stopping before model tools
+  try 1: stopped early — No matching listings. Try broader keywords, a different size
+[1] parse_query
+      in:  designer ballgown size XXS under $5
+      out: {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+      out: [] (empty)
+      →    branch: empty search; stopping before model tools
+  try 2: stopped early — No matching listings. Try broader keywords, a different size
+[1] parse_query
+      in:  designer ballgown size XXS under $5
+      out: {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+      out: [] (empty)
+      →    branch: empty search; stopping before model tools
+  try 3: stopped early — No matching listings. Try broader keywords, a different size
+[1] parse_query
+      in:  designer ballgown size XXS under $5
+      out: {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+      out: [] (empty)
+      →    branch: empty search; stopping before model tools
+  try 4: stopped early — No matching listings. Try broader keywords, a different size
+[1] parse_query
+      in:  designer ballgown size XXS under $5
+      out: {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+      out: [] (empty)
+      →    branch: empty search; stopping before model tools
+  try 5: stopped early — No matching listings. Try broader keywords, a different size
+
+Complete state matches tool arguments  (example wardrobe)
+  query: vintage graphic tee under $30, size M
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Outfit 1: Y2K Baby Tee — Butterfly Print paired with Baggy straight-leg jeans, dark wash, Vintage black denim …
+      →    wardrobe items: 10
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Channel serious Y2K streetwear vibes by pairing the fitted Y2K Baby Tee — Butterfly Print with baggy dark wash…
+  try 1: completed — fit card 275 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Outfit 1: Pair the Y2K Baby Tee — Butterfly Print with the Baggy straight-leg jeans, dark wash, Chunky white s…
+      →    wardrobe items: 10
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Leaning into a classic Y2K streetwear vibe, this fitted Y2K Baby Tee — Butterfly Print pairs perfectly with re…
+  try 2: completed — fit card 261 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: **Outfit 1:** *   Y2K Baby Tee — Butterfly Print *   Baggy straight-leg jeans, dark wash *   Chunky white snea…
+      →    wardrobe items: 10
+  [rate limit] 15 requests used this minute. Waiting 23s. This is normal.
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Channel your inner early 2000s energy by styling this Y2K Baby Tee — Butterfly Print with baggy dark wash jean…
+  try 3: completed — fit card 319 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: **Outfit 1:** Y2K Baby Tee — Butterfly Print paired with Baggy straight-leg jeans, dark wash, Vintage black de…
+      →    wardrobe items: 10
+  [rate limit] 15 requests used this minute. Waiting 1s. This is normal.
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Channel major Y2K streetwear energy by pairing this fitted Y2K Baby Tee — Butterfly Print with dark wash baggy…
+  try 4: completed — fit card 321 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+  [rate limit] 15 requests used this minute. Waiting 2s. This is normal.
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: **Outfit 1:** Pair the Y2K Baby Tee — Butterfly Print with Baggy straight-leg jeans, dark wash, Chunky white s…
+      →    wardrobe items: 10
+  [rate limit] 15 requests used this minute. Waiting 1s. This is normal.
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Channel effortless Y2K streetwear proportions by pairing the Y2K Baby Tee — Butterfly Print with baggy dark-wa…
+  try 5: completed — fit card 304 chars
+
+Fit card length and listing facts  (example wardrobe)
+  query: vintage graphic tee under $30, size M
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: **Outfit 1:** Pair the Y2K Baby Tee — Butterfly Print with Baggy straight-leg jeans, dark wash, Chunky white s…
+      →    wardrobe items: 10
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Pair the Y2K Baby Tee — Butterfly Print with baggy dark wash jeans and chunky white sneakers for the ultimate …
+  try 1: completed — fit card 192 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: **Outfit 1:** Pair the Y2K Baby Tee — Butterfly Print with Baggy straight-leg jeans, dark wash, Chunky white s…
+      →    wardrobe items: 10
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Embrace retro-casual style by pairing the Y2K Baby Tee — Butterfly Print with wide-leg khaki trousers and a br…
+  try 2: completed — fit card 305 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: **Outfit 1:** Y2K Baby Tee — Butterfly Print paired with Baggy straight-leg jeans, dark wash, Vintage black de…
+      →    wardrobe items: 10
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Embrace the ultimate Y2K aesthetic with the Y2K Baby Tee — Butterfly Print, featuring a cute pink, purple, and…
+  try 3: completed — fit card 383 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: **Outfit 1:** Y2K Baby Tee — Butterfly Print paired with Baggy straight-leg jeans, dark wash, Vintage black de…
+      →    wardrobe items: 10
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Channel your inner early 2000s energy with the Y2K Baby Tee — Butterfly Print, featuring a super cute graphic …
+  try 4: completed — fit card 331 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Outfit 1: Pair the Y2K Baby Tee — Butterfly Print with Baggy straight-leg jeans, dark wash, Vintage black deni…
+      →    wardrobe items: 10
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Channel authentic Y2K streetwear by styling the Y2K Baby Tee — Butterfly Print with baggy straight-leg jeans, …
+  try 5: completed — fit card 294 chars
+
+Empty wardrobe gets useful advice  (empty wardrobe)
+  query: vintage graphic tee under $30, size M
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+  [rate limit] 15 requests used this minute. Waiting 12s. This is normal.
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: No wardrobe items were supplied. Here are two ways to style a Y2K Baby Tee — Butterfly Print:  **Outfit 1: Cas…
+      →    wardrobe items: 0
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Channel effortless 2000s street style by pairing the Y2K Baby Tee — Butterfly Print with low-rise baggy cargo …
+  try 1: completed — fit card 236 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+  [rate limit] 15 requests used this minute. Waiting 1s. This is normal.
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: No wardrobe items were supplied. Here are two ways to style a Y2K Baby Tee — Butterfly Print:  **Outfit 1: Cas…
+      →    wardrobe items: 0
+  [rate limit] 15 requests used this minute. Waiting 2s. This is normal.
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Channel early 2000s nostalgia with this super cute Y2K Baby Tee — Butterfly Print, available now on depop for …
+  try 2: completed — fit card 305 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+  [rate limit] 15 requests used this minute. Waiting 1s. This is normal.
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: No wardrobe items were supplied. Here are a general styling ideas featuring the Y2K Baby Tee — Butterfly Print…
+      →    wardrobe items: 0
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Channel ultimate early 2000s energy by styling this Y2K Baby Tee — Butterfly Print with low-rise baggy cargo p…
+  try 3: completed — fit card 256 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: No wardrobe items were supplied. Here are a general styling ideas featuring the Y2K Baby Tee — Butterfly Print…
+      →    wardrobe items: 0
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Lean into authentic 2000s retro streetwear by pairing this nostalgic Y2K Baby Tee — Butterfly Print with low-r…
+  try 4: completed — fit card 306 chars
+[1] parse_query
+      in:  vintage graphic tee under $30, size M
+      out: {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': 'M', 'max_price': 30.0}
+      out: 8 items: Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black, 90s Silk Slip Dress — Floral, Midi Length … +5 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+  [rate limit] 15 requests used this minute. Waiting 2s. This is normal.
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: No wardrobe items were supplied. Here are two ways to style a Y2K Baby Tee — Butterfly Print:  **Outfit 1: Cas…
+      →    wardrobe items: 0
+  [rate limit] 15 requests used this minute. Waiting 5s. This is normal.
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Channel total early 2000s energy with this super cute Y2K Baby Tee — Butterfly Print, featuring a fitted crop …
+  try 5: completed — fit card 339 chars
+
+Wrote results/run_2026-10-06_134724_before.md
+40 model calls this session, 21648 prompt + 5033 output tokens
+
+Commit this file. It's the evidence the test actually happened.

@@ -379,28 +379,181 @@ The implementation and write-up are present. The criteria authorship/timing depa
 
 ## Run Log — Before
 
-<!-- Five criteria, five tries each, in this exact format.
-
-     Five, because your criteria are written out of five. Mark each try PASS
-     or FAIL, count the passes, and read that count against your target — a
-     row targeting 4 of 5 with three PASS cells is MISSED (3/5).
-
-     `python run_eval.py --label before` runs everything and writes the table
-     into results/. Paste it here and fill in the verdicts. -->
+Command: `python run_eval.py --label before`.
+Five scenarios, each run five separate times; caching disabled, temperature
+`0.9`. Agent code and criteria were unchanged throughout this evaluation.
+The runner's observation wrappers called the original tools and copied their
+actual arguments and returns; no results were substituted. The runner also
+passes `use_trace=True` so the traces are captured.
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. Full three-tool run returns a fit card | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. Empty search stops before model tools | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. Complete state matches tool arguments | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. Fit card length and listing facts | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 5. Empty wardrobe gets useful advice | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 
-**Real output from one try**, pasted as text, naming the file and function
-that produced it:
+Evidence: [complete run log](results/run_2026-10-06_134724_before.md),
+[raw sessions and calls](results/run_2026-10-06_134724_before.json), and
+[per-try scoring notes](results/run_2026-10-06_134724_before_scored.json).
+All 25 tries completed without a crash. The four model-backed scenarios each
+made 10 model requests; empty search made zero. Total: **40 model calls**,
+21,648 prompt tokens and 5,033 output tokens. Each model-backed scenario
+produced five distinct captions. The starter paced requests when needed.
+Scoring combines recorded call/state checks with reading every criterion 4
+and 5 output. A 5/5 result on these fixed inputs does not establish reliability
+for other inputs or eliminate the limitations noted elsewhere in this README.
 
+**Criterion 1 — actual output from try 1**
+
+Query: `vintage graphic tee under $30, size M`. Produced by `agent.py::run_agent` and `tools.py::create_fit_card`; call order captured by `run_eval.py::run_once`.
+
+```text
+search_listings (via MCP) → suggest_outfit → create_fit_card
+Embrace classic Y2K street style with this super cute butterfly print baby tee, listed for $18.00 on depop. Pair it with baggy dark wash jeans and chunky white sneakers for a fitted, cropped look that balances effortless volume.
 ```
 
+**Criterion 2 — actual output from try 1**
+
+Query: `designer ballgown size XXS under $5`. Produced by `agent.py::run_agent`; trace captured by `run_eval.py::run_once`.
+
+```text
+[1] parse_query
+      in:  designer ballgown size XXS under $5
+      out: {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+      out: [] (empty)
+      →    branch: empty search; stopping before model tools
+No matching listings. Try broader keywords, a different size, or a higher price limit.
+fit_card: None
+model_calls: 0
+```
+
+**Criterion 3 — actual output from try 1**
+
+Query: `vintage graphic tee under $30, size M`. Session from `agent.py::run_agent`; tool-argument snapshots from `run_eval.py::run_once`. These are complete listing dictionaries, not ID-only comparisons.
+
+```json
+{
+  "search_results[0]": {
+    "id": "lst_002",
+    "title": "Y2K Baby Tee — Butterfly Print",
+    "description": "Super cute early 2000s baby tee with butterfly graphic. Fitted crop length. Tag says medium but fits like a small.",
+    "category": "tops",
+    "style_tags": [
+      "y2k",
+      "vintage",
+      "graphic tee",
+      "cottagecore"
+    ],
+    "size": "S/M",
+    "condition": "excellent",
+    "price": 18.0,
+    "colors": [
+      "white",
+      "pink",
+      "purple"
+    ],
+    "brand": null,
+    "platform": "depop"
+  },
+  "selected_item": {
+    "id": "lst_002",
+    "title": "Y2K Baby Tee — Butterfly Print",
+    "description": "Super cute early 2000s baby tee with butterfly graphic. Fitted crop length. Tag says medium but fits like a small.",
+    "category": "tops",
+    "style_tags": [
+      "y2k",
+      "vintage",
+      "graphic tee",
+      "cottagecore"
+    ],
+    "size": "S/M",
+    "condition": "excellent",
+    "price": 18.0,
+    "colors": [
+      "white",
+      "pink",
+      "purple"
+    ],
+    "brand": null,
+    "platform": "depop"
+  },
+  "suggest_outfit.new_item": {
+    "id": "lst_002",
+    "title": "Y2K Baby Tee — Butterfly Print",
+    "description": "Super cute early 2000s baby tee with butterfly graphic. Fitted crop length. Tag says medium but fits like a small.",
+    "category": "tops",
+    "style_tags": [
+      "y2k",
+      "vintage",
+      "graphic tee",
+      "cottagecore"
+    ],
+    "size": "S/M",
+    "condition": "excellent",
+    "price": 18.0,
+    "colors": [
+      "white",
+      "pink",
+      "purple"
+    ],
+    "brand": null,
+    "platform": "depop"
+  },
+  "create_fit_card.new_item": {
+    "id": "lst_002",
+    "title": "Y2K Baby Tee — Butterfly Print",
+    "description": "Super cute early 2000s baby tee with butterfly graphic. Fitted crop length. Tag says medium but fits like a small.",
+    "category": "tops",
+    "style_tags": [
+      "y2k",
+      "vintage",
+      "graphic tee",
+      "cottagecore"
+    ],
+    "size": "S/M",
+    "condition": "excellent",
+    "price": 18.0,
+    "colors": [
+      "white",
+      "pink",
+      "purple"
+    ],
+    "brand": null,
+    "platform": "depop"
+  },
+  "outfit_argument_matches_session": true
+}
+```
+
+**Criterion 4 — actual output from try 1**
+
+Query: `vintage graphic tee under $30, size M`. Produced by `tools.py::create_fit_card`, stored by `agent.py::run_agent`.
+
+```text
+Pair the Y2K Baby Tee — Butterfly Print with baggy dark wash jeans and chunky white sneakers for the ultimate relaxed streetwear vibe. This super cute cropped top is listed for $18.0 on Depop.
+```
+
+**Criterion 5 — actual output from try 1**
+
+Query: `vintage graphic tee under $30, size M`. Empty wardrobe. Produced by `tools.py::suggest_outfit` and `tools.py::create_fit_card`, stored by `agent.py::run_agent`.
+
+```text
+No wardrobe items were supplied. Here are two ways to style a Y2K Baby Tee — Butterfly Print:
+
+**Outfit 1: Casual Streetwear**
+Pair the baby tee with a pair of low-rise baggy cargo pants in a neutral shade like khaki or olive green, and finish the look with chunky platform sneakers.
+*Why it works:* The fitted, feminine silhouette of the crop top balances the relaxed, utilitarian vibe of the cargo pants, creating an effortless Y2K contrast.
+
+**Outfit 2: Sweet & Retro**
+Style the tee with a pleated denim mini skirt, pastel platform slides, and a small shoulder bag.
+*Why it works:* The white, pink, and purple butterfly graphic pops against the classic denim, while the matching pastel accessories tie the nostalgic 2000s color palette together.
+
+Fit card:
+Channel effortless 2000s street style by pairing the Y2K Baby Tee — Butterfly Print with low-rise baggy cargo pants and chunky platform sneakers. Available for $18.0 on depop, this fitted crop top creates the ultimate nostalgic balance.
 ```
 
 ---
@@ -658,7 +811,7 @@ $ python app.py ask 'designer ballgown size XXS under $5'
 
 The MCP move succeeded with no observed return-value differences. Trace
 instrumentation and the three failure probes are now recorded above; repeated
-uncached acceptance runs remain a later milestone.
+uncached acceptance runs are now recorded under Run Log — Before.
 
 
 ---
