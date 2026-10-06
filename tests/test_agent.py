@@ -25,12 +25,12 @@ class AgentTests(unittest.TestCase):
         item = load_listings()[5]
         wardrobe = get_example_wardrobe()
         calls = Mock()
-        with patch.object(agent, 'search_listings', return_value=[item]) as search, patch.object(agent, 'suggest_outfit', return_value='Outfit') as outfit, patch.object(agent, 'create_fit_card', return_value='Caption') as card:
+        with patch.object(agent.mcp_client, 'call_tool', return_value=[item]) as search, patch.object(agent, 'suggest_outfit', return_value='Outfit') as outfit, patch.object(agent, 'create_fit_card', return_value='Caption') as card:
             for name, tool in [('search', search), ('outfit', outfit), ('card', card)]:
                 calls.attach_mock(tool, name)
             session = agent.run_agent('graphic tee under $30', wardrobe)
         self.assertEqual([c[0] for c in calls.mock_calls], ['search', 'outfit', 'card'])
-        search.assert_called_once_with(description='graphic tee', size=None, max_price=30.0)
+        search.assert_called_once_with('search_listings', {'description': 'graphic tee', 'size': None, 'max_price': 30.0})
         self.assertIs(session['selected_item'], session['search_results'][0])
         self.assertIs(outfit.call_args.args[0], session['selected_item'])
         self.assertIs(outfit.call_args.args[1], session['wardrobe'])
@@ -52,7 +52,7 @@ class AgentTests(unittest.TestCase):
         self.assertIn('higher price limit', session['error'])
 
     def test_iteration_guard_runs_before_each_step(self):
-        with patch.object(agent.config, 'MAX_ITERATIONS', 1), patch.object(agent, 'search_listings', return_value=[load_listings()[0]]), patch.object(agent, 'suggest_outfit') as outfit:
+        with patch.object(agent.config, 'MAX_ITERATIONS', 1), patch.object(agent.mcp_client, 'call_tool', return_value=[load_listings()[0]]), patch.object(agent, 'suggest_outfit') as outfit:
             with self.assertRaisesRegex(RuntimeError, 'MAX_ITERATIONS'):
                 agent.run_agent('jeans', {'items': []})
             outfit.assert_not_called()

@@ -174,7 +174,8 @@ wardrobe or blank response; the agent's handler is added in Unit 4.
      The grader checks your code against what you claim here, so the file and
      function have to be real. -->
 
-**Branch rule:** Store the return value of `search_listings` in
+**Branch rule:** Call `mcp_client.call_tool("search_listings", session["parsed"])`
+and store its return value in
 `session["search_results"]`. If it is `[]`, set `session["error"]` to
 `No matching listings. Try broader keywords, a different size, or a higher price limit.`
 and return the session immediately; `selected_item`, `outfit_suggestion`,
@@ -456,11 +457,69 @@ that produced it:
 
 ```
 
-**On the MCP move:** <!-- what changed in your code, and whether anything
-behaved differently afterwards. If the rewire didn't work, say exactly where it
-broke — the error text and the last thing that worked. That earns the point in
-full. -->
+**On the MCP move — Unit 4, Milestone 1:** Only `search_listings` is
+registered with FastMCP in `mcp_server.py`. Its wrapper delegates to the
+existing `tools.search_listings` implementation, preserving the Tool Inventory
+inputs: required `description: str`, optional `size: str | None = None`, and
+optional inclusive `max_price: float | None = None` in dollars.
 
+`agent.py::run_agent` now calls
+`mcp_client.call_tool("search_listings", session["parsed"])`. The supplied
+client starts a local stdio server with the same Python interpreter, unwraps
+the response into `list[dict]`, and closes the server after the request.
+`suggest_outfit` and `create_fit_card` remain local calls. No new dependencies
+were installed and no client changes were needed.
+
+Discovery output:
+
+```text
+$ python mcp_client.py
+Asking mcp_server.py what it offers…
+
+  search_listings
+    Search local listings by keyword description, optional size string, and inclusive max_price in dollars; return ranked listing dictionaries or [] when nothing matches.
+    - description: string
+    - size: string  (optional)
+    - max_price: number  (optional)
+```
+
+Validation:
+
+```text
+$ python -m unittest discover -s tests -v
+Ran 13 tests in 3.000s
+OK
+```
+
+The real stdio tests compared full returned records and ordering against the
+direct implementation for five inputs: description-only search, combined
+size/price filtering, numeric shoe size with an explicit null price, an
+impossible query, and an empty description. All results were equal, including
+`[]` for no matches. A separate check confirmed the server rejects a call
+missing the required description. The agent checks still verify tool order,
+state identity after search, and early stopping.
+
+The following full query was rerun through MCP:
+
+```bash
+python app.py ask 'vintage graphic tee under $30'
+```
+
+It returned the same $18 Y2K Baby Tee listing, outfit suggestions, and caption
+shown in Sample Run. Search went through the real MCP server; the two model
+responses came from the existing cache (`0 model calls this session, 2 served
+from cache`). This validates the transport change, not fresh model variation.
+
+```text
+$ python app.py ask 'designer ballgown size XXS under $5'
+
+  No matching listings. Try broader keywords, a different size, or a higher price limit.
+
+0 model calls this session
+```
+
+The MCP move succeeded with no observed return-value differences. Trace
+instrumentation and repeated uncached acceptance runs remain later milestones.
 
 
 ---
