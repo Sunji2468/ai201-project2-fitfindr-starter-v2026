@@ -110,24 +110,46 @@ This is the expected starting behavior for Milestone 1.
 
 ### `search_listings`
 
-- **What it does:**
-- **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Searches the local listings by keyword overlap, with optional size and inclusive price filters, without calling the model.
+- **Inputs:** `description` (`str`); `size` (`str | None`, default `None` to skip size filtering); `max_price` (`float | None`, default `None` to skip price filtering).
+- **Returns:** A `list[dict]` of up to `config.SEARCH_RESULT_LIMIT` (currently 10) matching original listings, each containing `id`, `title`, `description`, `category`, `style_tags` (`list[str]`), `size`, `condition`, `price` (numeric), `colors` (`list[str]`), `brand` (`str | None`), and `platform`; all other fields are strings. Sort by keyword score descending, preserving dataset order for ties.
+- **When it has nothing:** Returns `[]` for no matches or a description with no searchable tokens, never `None` or an error string.
+
+Search rules: lowercase and tokenize the description and each listing's
+`title`, `description`, `category`, and `style_tags` using `[a-z0-9]+`.
+Score one point per distinct query token found in those listing tokens;
+keep only positive scores after filtering. Partial keyword overlap is
+allowed; no synonyms, stemming, or model-based interpretation. Enforce
+`price <= max_price` when a ceiling is supplied.
+
+Size rules: trim whitespace, compare case-insensitively, and remove
+parenthetical fit notes. Compare whole size alternatives split on `/`,
+with any shared alternative counting as a match: `M` matches `S/M` and
+`L` matches `L/XL`, but `L` does not match `XL`. Normalize a bare numeric
+shoe size such as `8.5` to `US 8.5`; `8` does not match `US 8.5`, and `S`
+does not match `US 9`. A waist-only request `W30` matches `W30 L30`;
+a request specifying both waist and length must match both. Normalize
+sizes beginning with `One Size` to `One Size`, which only matches a
+`One Size` request. Other sizes require exact normalized equality.
 
 ### `suggest_outfit`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Uses `generate()` to suggest one or two outfits combining a selected listing with the user's wardrobe.
+- **Inputs:** `new_item` (`dict`, one complete listing with the fields above); `wardrobe` (`dict`) containing `items` (`list[dict]`), whose items have `id`, `name`, `category` (strings), `colors`, `style_tags` (`list[str]`), and optional `notes` (`str | None`).
+- **Returns:** A non-empty `str` naming the selected item and specific wardrobe pieces by their supplied names, explaining how their colors or styles work together. It must not invent owned pieces or a brand when `brand` is `None`.
+- **When it has nothing:** With `{"items": []}`, returns non-empty general styling advice from `generate()`, explicitly stating that no wardrobe items were supplied and presenting suggested pieces as ideas, not owned items. If the model returns blank text, returns `No outfit suggestion was generated. Please try again.`
 
 ### `create_fit_card`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Uses `generate()` to turn an outfit suggestion and selected listing into a short, post-ready caption.
+- **Inputs:** `outfit` (`str`, the suggestion from `suggest_outfit`); `new_item` (`dict`, the same complete listing used for that suggestion).
+- **Returns:** A non-empty `str` containing a two-to-four-sentence caption that mentions the item, its listed price, and its platform once each and describes the outfit's specific style. Use the supplied outfit and listing facts; omit an unknown brand rather than inventing one.
+- **When it has nothing:** For an empty or whitespace-only `outfit`, returns `Cannot create a fit card without an outfit suggestion.` without calling the model. If the model returns blank text, returns `No fit card was generated. Please try again.`
+
+These are contracts for the upcoming implementation; the tools are still
+stubs. Inputs use the dataset shapes above. A model service failure remains
+the adapter's `ModelUnavailable` exception, distinct from a valid empty
+wardrobe or blank response; the agent's handler is added in Unit 4.
 
 ---
 
@@ -144,9 +166,18 @@ This is the expected starting behavior for Milestone 1.
      The grader checks your code against what you claim here, so the file and
      function have to be real. -->
 
-**Branch rule:**
+**Branch rule:** Store the return value of `search_listings` in
+`session["search_results"]`. If it is `[]`, set `session["error"]` to
+`No matching listings. Try broader keywords, a different size, or a higher price limit.`
+and return the session immediately; `selected_item`, `outfit_suggestion`,
+and `fit_card` stay `None`, and neither model tool runs. Otherwise, store
+the first result in `session["selected_item"]`, call `suggest_outfit` with
+that item and `session["wardrobe"]`, and store its string in
+`session["outfit_suggestion"]`. Then call `create_fit_card` with that string
+and the same selected item, store it in `session["fit_card"]`, and return
+the session.
 
-**Where it lives:** `agent.py::run_agent`
+**Where it lives:** `agent.py::run_agent` (planned for Milestone 5).
 
 **How the query is parsed:** <!-- regex, string splitting, or asking the model — say which -->
 
