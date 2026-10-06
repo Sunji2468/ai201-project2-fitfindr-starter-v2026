@@ -354,6 +354,19 @@ see the authorship and timing note in `criteria.md`.
 - *What came back:* Codex implemented the three tools, added seven local checks, and ran live wardrobe and caption checks. Three uncached captions differed, but the output also exposed a mesh-top search match based on its description and an unsupported reference to “matching dark hardware” in styling advice.
 - *What I changed:* Codex replaced the stubs in `tools.py`, added `tests/test_tools.py`, and pasted actual commands and outputs into this README in commit `ec10b20`. It disabled caching only in the caption comparison process, leaving the normal configuration unchanged. The limitations were documented rather than reported as solved; I have not made a separate manual correction to them.
 
+
+**Unit 4 — MCP and failure tracing**
+
+- *What I asked for:* I gave Codex the instructions to move one tool onto MCP, trigger the three failure cases, and show the agent's steps.
+- *What came back:* Codex registered only `search_listings`, checked its results against direct calls, and confirmed the normal and empty-search paths. It added opt-in traces and a handler for model failures, then captured an actual rejected-key request with caching off.
+- *What I changed:* Codex edited `mcp_server.py`, `agent.py`, `app.py`, and the trace formatting, added regression tests, and recorded the real output in commits `dfd2a48` and `f650f11`. The invalid key existed only in a child process; my saved `.env` stayed unchanged. These were direct AI-assisted edits, not changes I separately implemented by hand.
+
+**Unit 4 — Evaluation, diagnosis, and one prompt change**
+
+- *What I asked for:* I asked Codex to run five trials per criterion, challenge the verdicts, fix one diagnosed issue, and rerun the same test.
+- *What came back:* Codex captured 25 uncached tries before and 25 after, including real tool arguments for the state criterion. The review found omitted full titles outside the assigned caption-quality row; the after-run fixed those omissions but introduced ambiguous price attribution in one scored caption.
+- *What I changed:* Codex replaced one caption instruction with a requirement to copy the full title verbatim, then wrote both scored logs and the comparison in commit `7566044`. I did not manually rewrite the model outputs or change the targets. The README records the mixed result: title inclusion improved from 18/20 to 20/20, while criterion 4 fell from 5/5 to 4/5. Codex also performed the scoring and wording review; it was not an independent human assessment.
+
 ---
 
 ## Unit 3 Submission Status
@@ -933,11 +946,36 @@ The baseline results and acceptance criteria remain intact.
 
 ## What's Still Broken
 
-<!-- For each criterion still missed: what you'd do, and why you stopped where
-     you did. "I ran out of time" is fine if it's true. Pretending nothing is
-     left is not. -->
+No criterion remains MISSED against its original target in the after-run:
+criteria 1, 2, 3, and 5 passed 5/5, and criterion 4 passed 4/5 against a 4/5
+target. That still leaves an observed caption failure and limits on what the
+evaluation establishes.
 
+- **Price attribution remains unreliable.** In criterion 4, after try 5, the caption places “for $18.00 on depop” after “a vintage black denim jacket,” making the tee's price ambiguous. This is a model-output failure in `create_fit_card`, not a missing price in session state. I would require a separate sentence explicitly pairing the selected item's title with its price and platform, then check that relationship in the output. I stopped after the title-only prompt change to keep this unit's before/after comparison attributable to one change; I have not tested a price-attribution fix.
+- **Outfit advice can invent fit details.** The unchanged `suggest_outfit` prompt still produced “low-slung” descriptions of jeans whose wardrobe notes say high-waisted, including criterion 4 after tries 1 and 3. I would tighten that tool's prompt to treat supplied notes as constraints and leave unknown fit details unspecified, then evaluate advice against several wardrobes. I left that separate prompt unchanged to preserve the one-change experiment.
+- **Search can match incidental words.** Keyword overlap can return the mesh top because its description mentions a graphic tee. I would test relevance on a fixed set of queries and compare stronger title/tag weighting or required garment terms. No relevance improvement was measured here, so the README does not claim it was solved.
+- **Coverage is narrow.** The model-backed scenarios all selected the same baby tee, and the regex parser supports only documented price/size phrases. I would add varied listings, missing-note cases, and alternate phrasings in a separate evaluation. I kept the current inputs fixed so the before and after results remained comparable rather than expanding the test after seeing results.
 
+**MCP move:** `agent.py::run_agent` now calls
+`mcp_client.call_tool("search_listings", session["parsed"])`, and
+`mcp_server.py` exposes the existing local search implementation as one typed
+tool. Five direct-versus-MCP checks found identical lists, ordering, and empty
+results. The client now starts a subprocess per search; the two model tools
+remain local. No return-value differences were observed in those checks.
+
+## Unit 4 Submission Status
+
+The before and after run logs, five verdicts, diagnoses, real traces, failure
+probes, and remaining limitations are included in this README and `results/`.
+The unit has at least four new commits: `dfd2a48`, `f650f11`, `d92a3b4`,
+`2796d17`, and `7566044`, followed by this final write-up commit. The same
+repository and prior history are preserved; the criteria authorship and
+chronology note remains in `criteria.md`.
+
+Submit this same fork URL through the Course Portal:
+[Sunji2468/ai201-project2-fitfindr-starter-v2026](https://github.com/Sunji2468/ai201-project2-fitfindr-starter-v2026).
+The URL is saved here for reuse. Course-portal submission has not been
+performed or verified from this workspace.
 
 <!-- ═════════════════════════════════════════════════════════════════════
 
@@ -956,18 +994,18 @@ The baseline results and acceptance criteria remain intact.
 
      SUBMISSION CHECKLIST — unit 4
 
-       [ ] mcp_server.py exists with one tool registered
+       [x] mcp_server.py exists with one tool registered
            (or a written record of exactly where the rewire broke)
-       [ ] Run Log — Before, five criteria, five tries each
-       [ ] Real output pasted underneath, naming file and function
-       [ ] A verdict on every criterion
-       [ ] A diagnosis for every miss, naming a place AND a mechanism
-       [ ] Loop Trace, with the MCP call visible in it
-       [ ] All three failure modes triggered and handled
-       [ ] One improvement, with Run Log — After in the same format
-       [ ] What's Still Broken
-       [ ] At least four new commits
-       [ ] The SAME repository URL as last unit
+       [x] Run Log — Before, five criteria, five tries each
+       [x] Real output pasted underneath, naming file and function
+       [x] A verdict on every criterion
+       [x] A diagnosis for every miss, naming a place AND a mechanism
+       [x] Loop Trace, with the MCP call visible in it
+       [x] All three failure modes triggered and handled
+       [x] One improvement, with Run Log — After in the same format
+       [x] What's Still Broken
+       [x] At least four new commits
+       [x] The SAME repository URL as last unit
 
      Do not delete and recreate this repository. Your commit history is what
      shows your criteria existed before your results did.
