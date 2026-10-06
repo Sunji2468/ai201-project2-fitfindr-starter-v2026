@@ -13,8 +13,8 @@
 > python app.py ask 'vintage graphic tee under $30'
 > ```
 >
-> The three tools are implemented and tested individually. The agent loop
-> remains a stub until Milestone 5, so the last command still stops there.
+> The three tools and planning loop are implemented. The query above runs
+> search, outfit suggestions, and a fit card; an empty search stops early.
 >
 > **The rest of this file is your submission.** Fill it in as you go.
 
@@ -98,8 +98,8 @@ short caption. Its standalone search tool filters 40 local sample listings
 by keywords, size, and price; its two model tools suggest outfits using a
 supplied wardrobe and write a two-to-four-sentence fit card. An empty
 wardrobe receives general styling advice, and an empty search returns `[]`.
-The tools work individually, but the CLI still returns the starter message
-because the planning loop has not been implemented.
+The CLI runs those tools through a shared session, choosing the first match
+or stopping with suggestions to change the search when nothing matches.
 
 
 ---
@@ -154,7 +154,7 @@ sizes beginning with `One Size` to `One Size`, which only matches a
 - **Returns:** A non-empty `str` containing a two-to-four-sentence caption that mentions the item, its listed price, and its platform once each and describes the outfit's specific style. Use the supplied outfit and listing facts; omit an unknown brand rather than inventing one.
 - **When it has nothing:** For an empty or whitespace-only `outfit`, returns `Cannot create a fit card without an outfit suggestion.` without calling the model. If the model returns blank text, returns `No fit card was generated. Please try again.`
 
-The tools now implement these contracts; the agent loop is still a stub.
+The tools and agent loop now implement the contracts and branch below.
 Inputs use the dataset shapes above. A model service failure remains
 the adapter's `ModelUnavailable` exception, distinct from a valid empty
 wardrobe or blank response; the agent's handler is added in Unit 4.
@@ -174,7 +174,7 @@ wardrobe or blank response; the agent's handler is added in Unit 4.
      The grader checks your code against what you claim here, so the file and
      function have to be real. -->
 
-**Planned branch rule (not yet implemented):** Store the return value of `search_listings` in
+**Branch rule:** Store the return value of `search_listings` in
 `session["search_results"]`. If it is `[]`, set `session["error"]` to
 `No matching listings. Try broader keywords, a different size, or a higher price limit.`
 and return the session immediately; `selected_item`, `outfit_suggestion`,
@@ -185,17 +185,22 @@ that item and `session["wardrobe"]`, and store its string in
 and the same selected item, store it in `session["fit_card"]`, and return
 the session.
 
-**Where it lives:** `agent.py::run_agent` (planned for Milestone 5).
+**Where it lives:** `agent.py::run_agent`.
 
-**How the query is parsed:** Not implemented. The current function stores
-the raw query but leaves `session["parsed"]` empty; no parsing method is
-being claimed as working.
+**How the query is parsed:** `agent.py::parse_query` uses case-insensitive
+regular expressions for `under`, `up to`, or `max` price clauses and sizes
+introduced by `size` (letters, slash alternatives, US shoe sizes, waist and
+optional length, or One Size). It removes these clauses and leading phrases
+such as “looking for a” to produce the remaining search description. The
+price ceiling is inclusive. This is a limited parser, not general natural
+language understanding; unsupported phrasings may remain search keywords.
 
-**What moves through the session:** Currently, `new_session` stores `query`
-and `wardrobe` and initializes the other fields. `run_agent` then sets
-`error` to the starter message and returns. The planned sequence is
-`parsed` → `search_results` → `selected_item` → `outfit_suggestion` →
-`fit_card`, with the empty-search branch returning before item selection.
+**What moves through the session:** `query` and `wardrobe` are stored first,
+then `parsed` → `search_results` → `selected_item` → `outfit_suggestion` →
+`fit_card`. Each tool result is stored before the next tool reads it from the
+session. The empty-search branch sets `error` and returns with later fields
+still `None`. A loop advances through search, outfit, and card steps and calls
+`trace.check_iterations` before each step to enforce `MAX_ITERATIONS`.
 
 ---
 
@@ -206,20 +211,51 @@ and `wardrobe` and initializes the other fields. `run_agent` then sets
      1. One FULL query and its output, pasted as text.
      2. Your three per-tool terminal tests — the command and what it printed. -->
 
-**Current CLI query — starter behavior, not a completed agent run**
+**One full query — Milestone 5**
 
 ```text
 $ python app.py ask 'vintage graphic tee under $30'
-  The planning loop isn't built yet — see the TODO in agent.py.
+  Found:    Y2K Baby Tee — Butterfly Print — $18.0 on depop
+
+  Outfit:   **Outfit 1: Y2K Streetwear**
+Pair the Y2K Baby Tee — Butterfly Print with the Baggy straight-leg jeans, dark wash, Chunky white sneakers, and Black crossbody bag.
+*Why it works:* The fitted crop length of the baby tee balances the loose, relaxed volume of the dark wash straight-leg jeans for a classic early 2000s silhouette, while the white sneakers tie in the white tones of the butterfly graphic.
+
+**Outfit 2: Casual Grunge**
+Combine the Y2K Baby Tee — Butterfly Print with the Wide-leg khaki trousers, Vintage black denim jacket, and Black combat boots.
+*Why it works:* The earthy tan trousers ground the playful pink and purple butterfly print, and layering the slightly cropped black denim jacket with black combat boots adds an edgy contrast to the sweet cottagecore and Y2K aesthetic.
+
+  Fit card: Channel classic early 2000s energy by pairing this Y2K Baby Tee — Butterfly Print with baggy straight-leg jeans, chunky white sneakers, and a black crossbody bag for the ultimate Y2K streetwear vibe. Snag this fitted crop top for $18.00 exclusively on depop to complete your nostalgic look.
+
+2 model calls this session, 1217 prompt + 252 output tokens
+```
+
+```text
+$ python app.py ask 'designer ballgown size XXS under $5'
+  No matching listings. Try broader keywords, a different size, or a higher price limit.
 
 0 model calls this session
 ```
 
+The full sessions and identity-check results are saved in
+[results/milestone5_checks.json](results/milestone5_checks.json). After the
+live CLI run, a second run used the normal response cache and wrapped
+`suggest_outfit` to inspect its actual arguments: its item was the same
+object as `session["selected_item"]` and `session["search_results"][0]`.
+The impossible query never called that tool and kept `fit_card` as `None`.
+
+All 11 local checks passed with `python -m unittest discover -s tests -v`,
+including tool order, session identity, parsing, the iteration guard, and
+stopping before model tools on empty search. These are implementation checks,
+not the next unit's five-try acceptance evaluations. The live caption's word
+“exclusively” is not supported by the listing; factual embellishment remains
+a model-output limitation to evaluate.
+
 **The three tools, tested one at a time — Milestone 4**
 
 Run from the repo with `.venv` activated. These are actual terminal outputs.
-The query above confirms the current stub behavior. A successful full agent
-run still needs to be recorded after Milestone 5; no loop is wired yet.
+These standalone checks were recorded before the loop was implemented.
+The completed loop runs appear above.
 
 ```text
 $ python -c "from tools import search_listings; print(search_listings('graphic tee', size='M', max_price=30)); print('No matches:', search_listings('designer ballgown', size='XXS', max_price=5))"
@@ -322,9 +358,9 @@ Fork URL to submit and reuse in Unit 4:
 Keep this repository and its commit history for both units.
 
 - The three standalone tools, their contracts, and their terminal checks are recorded above.
-- This write-up is the fourth new commit after starter commit `69997cf`; the earlier three are `c05b1e6`, `1073006`, and `ec10b20`.
+- Four new commits already followed starter commit `69997cf`: `c05b1e6`, `1073006`, `ec10b20`, and `9863686`. The Milestone 5 completion adds another commit; the original history is preserved.
 - `criteria.md` exists, but criteria 3–5 and all five target explanations are unfinished. The assignment asks the student to author these; Codex has not filled them in.
-- Milestone 5 is unfinished: implement the planning loop and query parser, verify both branches, then replace the starter-only sample run and update the planning-loop description.
+- Milestone 5 is now complete: the loop and query parser are implemented, both branches were checked, and real sample output and session evidence are recorded. Codex implemented this after I supplied the full assignment, including the previously skipped Milestone 5 instructions.
 - The fork URL is saved here. Submission to the course portal has not been performed or verified.
 
 The repository is not yet ready to claim all Unit 3 requirements are complete.
