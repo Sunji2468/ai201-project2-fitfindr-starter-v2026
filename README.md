@@ -560,33 +560,65 @@ Channel effortless 2000s street style by pairing the Y2K Baby Tee — Butterfly 
 
 ## Verdicts and Diagnoses
 
-<!-- MET or MISSED per criterion against LAST UNIT's target, plus a sentence on
-     how you decided.
-
-     Then, for every miss: which of the four places it happened — a tool, the
-     loop's branch, the session, or the model's output — AND the mechanism.
-
-     Not a diagnosis:  "The fit card was bad."
-     A diagnosis:      "The fit card criterion missed on 2 of 5 items. Both had
-                        an empty brand field. My prompt puts the brand in the
-                        first sentence, so the card opened with a blank and read
-                        like a fragment. The tool worked; the prompt assumed a
-                        field that isn't always there."
-
-     Look for a pattern. Three misses on the same tool is one problem, not
-     three. -->
+Verdicts use the five preassigned tries for each criterion from
+[the before run](results/run_2026-10-06_134724_before.md), checked against the
+unchanged targets in `criteria.md`. Codex re-read the raw outputs and argued
+against the initial all-pass scoring; this is an AI-assisted review, not an
+independent human evaluation.
 
 | # | Criterion | Target | Verdict | How I decided |
 |---|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
-| 5 |  |  |  |  |
+| 1 | Full three-tool run returns a fit card | 4 of 5 | MET (5/5) | All five call records show MCP search, outfit, then card; each session has no error and a non-fallback caption. This criterion explicitly checks completion, not caption quality. |
+| 2 | Empty search stops before model tools | 5 of 5 | MET (5/5) | All five runs contain only the MCP search call, return an empty results list, keep fit_card as None, and suggest changing keywords, size, or price. |
+| 3 | Complete state matches tool arguments | 5 of 5 | MET (5/5) | Compared the entire first search result and selected-item dictionaries with both downstream new_item arguments in all five snapshots; the outfit argument also equals the stored suggestion, and both calls completed. |
+| 4 | Fit card length and listing facts | 4 of 5 | MET (5/5) | The five assigned captions have 2, 2, 3, 3, and 2 sentences; each contains the full title, correct $18 price, and depop once, plus a named wardrobe piece from its outfit. None invents a brand, discount, or exclusivity. |
+| 5 | Empty wardrobe gets useful advice | 4 of 5 | MET (5/5) | All five advice strings explicitly acknowledge no supplied items, suggest other pieces with color or silhouette reasons, and produce captions without claiming those pieces are already owned. |
 
 **Diagnoses**
 
+No criterion missed its target in its five assigned tries, so there is no
+failed row to diagnose. That does not mean the agent has no defects. The
+following findings are outside the scored conditions, not retroactive changes
+to the before table:
 
+- **Model output at `tools.py::create_fit_card`: inconsistent full titles.** Criterion 1 tries 1 and 4 say “butterfly print baby tee” instead of the full title `Y2K Baby Tee — Butterfly Print`. The caption prompt asks to mention the item, but does not explicitly require copying its full title, and there is no output check enforcing that requirement. This is a plausible mechanism for the variation: the model paraphrases the item even when the session contains the correct title. These are two examples of the same prompt/validation gap. They pass criterion 1's completion test; they would fail criterion 4's full-title condition if scored under it. Criterion 4's own five preassigned captions all included the title, so its recorded verdict remains MET.
+- **Model output at `tools.py::suggest_outfit`: unsupported fit descriptions.** Criterion 4 try 1 describes the khaki trousers as “high-waisted,” although that item's notes are null. Tries 2 and 4 describe the dark jeans as “low-slung,” although their supplied notes say “High-waisted, sits above the hip.” The full wardrobe reaches the tool, so this is not evidence of lost session state. The model adds stereotypical Y2K fit details instead of consistently following the supplied notes; the prompt discourages invented facts but no check rejects these claims. These examples share one grounding problem. The current caption criterion does not score the factual accuracy of outfit prose, so they do not change its verdict.
+
+**Challenge to the verdicts**
+
+The strongest argument against criterion 4 being MET is that two captions
+from other runs of the same query omitted the full title. That is real
+counterevidence to a broad claim of reliability, but the scenario-to-criterion
+mapping was fixed before the run: it does not change which five tries form
+criterion 4's row. No tries were replaced, discarded, or rerun to obtain a
+pass. The correct conclusion is “MET on this assigned sample,” not “the
+caption always satisfies the contract.”
+
+The strongest objection to criterion 5 is try 3's phrase “to complete your
+nostalgic wardrobe.” Read in context, the preceding advice explicitly says
+no wardrobe items were supplied and offers pieces as suggestions; the caption
+does not claim the user owns the cargo pants or sneakers. That satisfies the
+written ownership condition. Grammar such as “Here are a general styling
+ideas” is poor, but grammatical quality is not one of the criterion's
+conditions and cannot be added after observing the result.
+
+**Were the targets too low? What would be tightened?**
+
+The coverage was too narrow for a broad claim that FitFindr works reliably:
+all four model-backed scenarios selected the same baby tee, and each used
+only one wording of the query. Criteria 2 and 3 already demand 5/5, while
+criteria 1, 4, and 5 allow one failure; raising a number alone would not address
+this coverage gap. Criterion 1 intentionally has a low quality bar, and
+criterion 4 checks only a limited subset of factual claims.
+
+For a future evaluation, criterion 4 is the one to tighten: require every
+concrete fit/material/ownership claim in both the advice and caption to be
+supported by the provided listing or wardrobe, with absent details left
+unspecified. Also test a fixed set of different listings and wardrobes,
+including missing brands and notes. This is a proposed future extension, not
+a revision or a new score for this run. The existing criteria were measurable;
+none has been deleted, rewritten, or relaxed. The next improvement can target
+one of the observed prompt gaps and be measured against the same baseline.
 
 ---
 
