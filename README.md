@@ -58,7 +58,7 @@ but it fits like a small. There is no separate fit or measurements field.
 
 Among these six records, the $18 baby tee and $24 graphic tee both have
 `vintage` and `graphic tee` style tags and are below $30. This is a data
-observation for the sample query; search is not implemented yet.
+observation for the sample query; search was not implemented at this milestone.
 
 The wardrobe passed to `suggest_outfit` is a dictionary with an `items`
 list. Each item has `id`, `name`, `category`, `colors`, `style_tags`, and
@@ -92,6 +92,14 @@ This is the expected starting behavior for Milestone 1.
 
 <!-- Three or four sentences: what a user asks for, and what they get back. -->
 
+FitFindr is being built to turn a thrift-shopping request such as
+`vintage graphic tee under $30` into a matching find, outfit advice, and a
+short caption. Its standalone search tool filters 40 local sample listings
+by keywords, size, and price; its two model tools suggest outfits using a
+supplied wardrobe and write a two-to-four-sentence fit card. An empty
+wardrobe receives general styling advice, and an empty search returns `[]`.
+The tools work individually, but the CLI still returns the starter message
+because the planning loop has not been implemented.
 
 
 ---
@@ -166,7 +174,7 @@ wardrobe or blank response; the agent's handler is added in Unit 4.
      The grader checks your code against what you claim here, so the file and
      function have to be real. -->
 
-**Branch rule:** Store the return value of `search_listings` in
+**Planned branch rule (not yet implemented):** Store the return value of `search_listings` in
 `session["search_results"]`. If it is `[]`, set `session["error"]` to
 `No matching listings. Try broader keywords, a different size, or a higher price limit.`
 and return the session immediately; `selected_item`, `outfit_suggestion`,
@@ -179,9 +187,15 @@ the session.
 
 **Where it lives:** `agent.py::run_agent` (planned for Milestone 5).
 
-**How the query is parsed:** <!-- regex, string splitting, or asking the model — say which -->
+**How the query is parsed:** Not implemented. The current function stores
+the raw query but leaves `session["parsed"]` empty; no parsing method is
+being claimed as working.
 
-**What moves through the session:** <!-- which fields, in what order -->
+**What moves through the session:** Currently, `new_session` stores `query`
+and `wardrobe` and initializes the other fields. `run_agent` then sets
+`error` to the starter message and returns. The planned sequence is
+`parsed` → `search_results` → `selected_item` → `outfit_suggestion` →
+`fit_card`, with the empty-search branch returning before item selection.
 
 ---
 
@@ -192,17 +206,20 @@ the session.
      1. One FULL query and its output, pasted as text.
      2. Your three per-tool terminal tests — the command and what it printed. -->
 
-**One full query**
+**Current CLI query — starter behavior, not a completed agent run**
 
-```
-$ python app.py ask '...'
+```text
+$ python app.py ask 'vintage graphic tee under $30'
+  The planning loop isn't built yet — see the TODO in agent.py.
 
+0 model calls this session
 ```
 
 **The three tools, tested one at a time — Milestone 4**
 
 Run from the repo with `.venv` activated. These are actual terminal outputs.
-The full agent query above is reserved for Milestone 5; no loop is wired yet.
+The query above confirms the current stub behavior. A successful full agent
+run still needs to be recorded after Milestone 5; no loop is wired yet.
 
 ```text
 $ python -c "from tools import search_listings; print(search_listings('graphic tee', size='M', max_price=30)); print('No matches:', search_listings('designer ballgown', size='XXS', max_price=5))"
@@ -286,15 +303,31 @@ still pending.
 
 **Moment 1**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I gave Codex the Milestone 2 instructions to specify the three tools before implementation.
+- *What came back:* Codex read the stubs and data and wrote typed inputs, concrete return shapes, empty cases, and a planned branch rule. It made size matching explicit: `M` can match `S/M`, but `S` must not match `US 9`, and `L` must not match `XL`.
+- *What I changed:* The README gained those contracts in commit `1073006`. Codex made these edits directly; I did not manually rewrite the spec in this session. The tools were still stubs at that point.
 
 **Moment 2**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I gave Codex the Milestone 4 instructions to implement and test each tool separately without wiring the loop.
+- *What came back:* Codex implemented the three tools, added seven local checks, and ran live wardrobe and caption checks. Three uncached captions differed, but the output also exposed a mesh-top search match based on its description and an unsupported reference to “matching dark hardware” in styling advice.
+- *What I changed:* Codex replaced the stubs in `tools.py`, added `tests/test_tools.py`, and pasted actual commands and outputs into this README in commit `ec10b20`. It disabled caching only in the caption comparison process, leaving the normal configuration unchanged. The limitations were documented rather than reported as solved; I have not made a separate manual correction to them.
+
+---
+
+## Unit 3 Submission Status
+
+Fork URL to submit and reuse in Unit 4:
+[Sunji2468/ai201-project2-fitfindr-starter-v2026](https://github.com/Sunji2468/ai201-project2-fitfindr-starter-v2026).
+Keep this repository and its commit history for both units.
+
+- The three standalone tools, their contracts, and their terminal checks are recorded above.
+- This write-up is the fourth new commit after starter commit `69997cf`; the earlier three are `c05b1e6`, `1073006`, and `ec10b20`.
+- `criteria.md` exists, but criteria 3–5 and all five target explanations are unfinished. The assignment asks the student to author these; Codex has not filled them in.
+- Milestone 5 is unfinished: implement the planning loop and query parser, verify both branches, then replace the starter-only sample run and update the planning-loop description.
+- The fork URL is saved here. Submission to the course portal has not been performed or verified.
+
+The repository is not yet ready to claim all Unit 3 requirements are complete.
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
