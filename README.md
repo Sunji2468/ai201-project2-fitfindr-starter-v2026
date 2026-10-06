@@ -850,31 +850,84 @@ uncached acceptance runs are now recorded under Run Log — Before.
 
 ## The Improvement
 
-<!-- What you changed, why your diagnosis pointed at it, and the after-run in
-     the same table format. One change, measured properly.
+**What I changed:** One instruction in `tools.py::create_fit_card`'s system
+prompt. Previously it said “Mention the selected item”; it now says:
 
-     `python run_eval.py --label after` -->
+```text
+Copy selected_item.title verbatim exactly once; do not shorten or paraphrase it.
+```
 
-**What I changed:**
+The outfit prompt, search, MCP transport, loop, criteria, scenarios, temperature,
+and evaluation runner were unchanged. No second fix was made after seeing the
+results. Local regression checks still passed: 17 tests.
 
-**Which failure it was meant to fix:**
+**Which failure it was meant to fix:** The before-run diagnosis found shortened
+titles in criterion 1 tries 1 and 4. Those passed that row's completion check,
+but did not satisfy the full-title requirement used by criterion 4. Across
+all 20 before-run captions, 18 included the full title exactly once. The old
+prompt allowed paraphrasing, so this change explicitly requests a verbatim copy.
+
+**How it was measured:** `python run_eval.py --label after`, five identical
+scenarios with five tries each, caching off and temperature `0.9`. The agent
+was unchanged during the run. It made 40 model requests (21,976 prompt tokens,
+5,301 output tokens); all 25 tries returned without crashes. Each of the four
+model-backed scenarios produced five distinct captions. These are fresh
+outputs, not cached copies of the before run.
+
+### Run Log — Before (repeated for comparison)
+
+| Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
+|---|---|---|---|---|---|---|---|
+| 1. Full three-tool run returns a fit card | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. Empty search stops before model tools | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. Complete state matches tool arguments | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. Fit card length and listing facts | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 5. Empty wardrobe gets useful advice | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 
 ### Run Log — After
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. Full three-tool run returns a fit card | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. Empty search stops before model tools | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. Complete state matches tool arguments | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. Fit card length and listing facts | 4 of 5 | PASS | PASS | PASS | PASS | FAIL | MET (4/5) |
+| 5. Empty wardrobe gets useful advice | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 
-**Did it help, and how do I know:**
+After evidence: [full output](results/run_2026-10-06_135609_after.md), [sessions and call snapshots](results/run_2026-10-06_135609_after.json),
+and [per-try scoring](results/run_2026-10-06_135609_after_scored.json). Both runs use the original targets.
 
-<!-- If it made things worse, say that. Honestly reported, that earns full
-     credit and is more interesting than one that worked. -->
+**Did it help, and how do I know:** The title-copying change helped on this
+sample (18/20 → 20/20 full titles), but overall caption quality did not improve:
+criterion 4 dropped from 5/5 to 4/5 because one caption ambiguously attached
+the tee's price to a jacket. All five criteria still meet their targets.
+The title count is a supplementary diagnostic across all captions, not a new
+acceptance criterion or a replacement for criterion 4's five assigned tries.
+With one before/after batch and stochastic model outputs, these observations
+do not prove the prompt caused either the improvement or the regression.
 
+**Actual after-run failure — criterion 4, try 5**
 
+Produced by `tools.py::create_fit_card`, stored by `agent.py::run_agent`:
+
+```text
+Channel early 2000s skater proportions by styling the Y2K Baby Tee — Butterfly Print with dark wash baggy straight-leg jeans and a vintage black denim jacket for $18.00 on depop. You can also style it with wide-leg khaki trousers and a brown leather belt for a modern-retro aesthetic. Both looks are grounded with chunky white sneakers for the ultimate casual streetwear vibe.
+```
+
+The numeric price is correct, but the phrase “a vintage black denim jacket
+for $18.00 on depop” does not clearly assign that price to the selected tee.
+I scored this FAIL under the existing requirement to include the selected
+item's correct price; the full title alone cannot make this caption pass.
+The step is the model output from `create_fit_card`: the prompt requests a
+price mention but does not require a separate, unambiguous statement tying it
+to the selected item, and no output check enforces that relationship.
+Criterion 1 try 4 also attaches “for $18.0 on depop” to a sentence about
+sneakers and a crossbody bag, showing the same pattern outside the quality row.
+It still passes criterion 1's explicitly narrower completion check.
+
+I kept this one prompt change and recorded the mixed result. Repairing price
+attribution would be a separate improvement with its own before/after test.
+The baseline results and acceptance criteria remain intact.
 
 ---
 

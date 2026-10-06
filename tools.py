@@ -96,7 +96,8 @@ def create_fit_card(outfit: str, new_item: dict) -> str:
         return "Cannot create a fit card without an outfit suggestion."
     system = (
         "Write a post-ready clothing caption of two to four sentences. "
-        "Mention the selected item, its listed price with a dollar sign, and its "
+        "Copy selected_item.title verbatim exactly once; do not shorten or paraphrase it. "
+        "Mention its listed price with a dollar sign and its "
         "platform exactly once each. Describe the specific outfit vibe naturally. "
         "Use only the supplied facts and outfit; do not invent a brand when it is null. "
         "Do not claim suggested pieces are owned if the advice says otherwise. "

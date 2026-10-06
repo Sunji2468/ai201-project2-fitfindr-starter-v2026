@@ -1,0 +1,312 @@
+{
+  "source": "run_2026-10-06_135609_after.json",
+  "reviewer": "Codex; same structural checks plus manual semantic review",
+  "manual_review": {
+    "criterion_4": "Read all five captions against their listings and outfits. Structural checks pass throughout: full title, numeric $18 price, platform, 2\u20134 sentences, and a named wardrobe piece. Tries 1\u20134 assign the price clearly to the tee. Try 5 ends its first sentence with \u201ca vintage black denim jacket for $18.00 on depop.\u201d That does not unambiguously name the selected item\u2019s price, so FAIL despite the correct number. No invented brand, discount, or exclusivity was found.",
+    "criterion_5": "Read all five complete advice/caption pairs. Each explicitly acknowledges no supplied wardrobe, offers other pieces with a color/silhouette reason, and returns a non-fallback caption without claiming those pieces are owned. All five PASS."
+  },
+  "title_diagnostic": {
+    "before": {
+      "full_title_once": 18,
+      "captions": 20
+    },
+    "after": {
+      "full_title_once": 20,
+      "captions": 20
+    }
+  },
+  "distinct_captions_per_model_criterion": {
+    "1": 5,
+    "3": 5,
+    "4": 5,
+    "5": 5
+  },
+  "tries": [
+    {
+      "criterion": 1,
+      "try": 1,
+      "result": "PASS",
+      "checks": {
+        "tool_order": true,
+        "no_error": true,
+        "caption_returned": true
+      }
+    },
+    {
+      "criterion": 1,
+      "try": 2,
+      "result": "PASS",
+      "checks": {
+        "tool_order": true,
+        "no_error": true,
+        "caption_returned": true
+      }
+    },
+    {
+      "criterion": 1,
+      "try": 3,
+      "result": "PASS",
+      "checks": {
+        "tool_order": true,
+        "no_error": true,
+        "caption_returned": true
+      }
+    },
+    {
+      "criterion": 1,
+      "try": 4,
+      "result": "PASS",
+      "checks": {
+        "tool_order": true,
+        "no_error": true,
+        "caption_returned": true
+      }
+    },
+    {
+      "criterion": 1,
+      "try": 5,
+      "result": "PASS",
+      "checks": {
+        "tool_order": true,
+        "no_error": true,
+        "caption_returned": true
+      }
+    },
+    {
+      "criterion": 2,
+      "try": 1,
+      "result": "PASS",
+      "checks": {
+        "search_only": true,
+        "empty_results": true,
+        "no_fit_card": true,
+        "actionable_message": true
+      }
+    },
+    {
+      "criterion": 2,
+      "try": 2,
+      "result": "PASS",
+      "checks": {
+        "search_only": true,
+        "empty_results": true,
+        "no_fit_card": true,
+        "actionable_message": true
+      }
+    },
+    {
+      "criterion": 2,
+      "try": 3,
+      "result": "PASS",
+      "checks": {
+        "search_only": true,
+        "empty_results": true,
+        "no_fit_card": true,
+        "actionable_message": true
+      }
+    },
+    {
+      "criterion": 2,
+      "try": 4,
+      "result": "PASS",
+      "checks": {
+        "search_only": true,
+        "empty_results": true,
+        "no_fit_card": true,
+        "actionable_message": true
+      }
+    },
+    {
+      "criterion": 2,
+      "try": 5,
+      "result": "PASS",
+      "checks": {
+        "search_only": true,
+        "empty_results": true,
+        "no_fit_card": true,
+        "actionable_message": true
+      }
+    },
+    {
+      "criterion": 3,
+      "try": 1,
+      "result": "PASS",
+      "checks": {
+        "all_tools_completed": true,
+        "listing_dicts_equal": true,
+        "outfit_equal": true
+      }
+    },
+    {
+      "criterion": 3,
+      "try": 2,
+      "result": "PASS",
+      "checks": {
+        "all_tools_completed": true,
+        "listing_dicts_equal": true,
+        "outfit_equal": true
+      }
+    },
+    {
+      "criterion": 3,
+      "try": 3,
+      "result": "PASS",
+      "checks": {
+        "all_tools_completed": true,
+        "listing_dicts_equal": true,
+        "outfit_equal": true
+      }
+    },
+    {
+      "criterion": 3,
+      "try": 4,
+      "result": "PASS",
+      "checks": {
+        "all_tools_completed": true,
+        "listing_dicts_equal": true,
+        "outfit_equal": true
+      }
+    },
+    {
+      "criterion": 3,
+      "try": 5,
+      "result": "PASS",
+      "checks": {
+        "all_tools_completed": true,
+        "listing_dicts_equal": true,
+        "outfit_equal": true
+      }
+    },
+    {
+      "criterion": 4,
+      "try": 1,
+      "result": "PASS",
+      "checks": {
+        "2_to_4_sentences": true,
+        "full_title_once": true,
+        "correct_price_once": true,
+        "platform_once": true,
+        "named_wardrobe_piece_in_outfit_and_caption": true,
+        "manual_no_invented_brand_discount_exclusivity": true,
+        "manual_price_is_unambiguously_for_selected_item": true
+      }
+    },
+    {
+      "criterion": 4,
+      "try": 2,
+      "result": "PASS",
+      "checks": {
+        "2_to_4_sentences": true,
+        "full_title_once": true,
+        "correct_price_once": true,
+        "platform_once": true,
+        "named_wardrobe_piece_in_outfit_and_caption": true,
+        "manual_no_invented_brand_discount_exclusivity": true,
+        "manual_price_is_unambiguously_for_selected_item": true
+      }
+    },
+    {
+      "criterion": 4,
+      "try": 3,
+      "result": "PASS",
+      "checks": {
+        "2_to_4_sentences": true,
+        "full_title_once": true,
+        "correct_price_once": true,
+        "platform_once": true,
+        "named_wardrobe_piece_in_outfit_and_caption": true,
+        "manual_no_invented_brand_discount_exclusivity": true,
+        "manual_price_is_unambiguously_for_selected_item": true
+      }
+    },
+    {
+      "criterion": 4,
+      "try": 4,
+      "result": "PASS",
+      "checks": {
+        "2_to_4_sentences": true,
+        "full_title_once": true,
+        "correct_price_once": true,
+        "platform_once": true,
+        "named_wardrobe_piece_in_outfit_and_caption": true,
+        "manual_no_invented_brand_discount_exclusivity": true,
+        "manual_price_is_unambiguously_for_selected_item": true
+      }
+    },
+    {
+      "criterion": 4,
+      "try": 5,
+      "result": "FAIL",
+      "checks": {
+        "2_to_4_sentences": true,
+        "full_title_once": true,
+        "correct_price_once": true,
+        "platform_once": true,
+        "named_wardrobe_piece_in_outfit_and_caption": true,
+        "manual_no_invented_brand_discount_exclusivity": true,
+        "manual_price_is_unambiguously_for_selected_item": false
+      },
+      "reason": "Price phrase follows vintage black denim jacket, making $18 ambiguous between the selected tee and the jacket/outfit."
+    },
+    {
+      "criterion": 5,
+      "try": 1,
+      "result": "PASS",
+      "checks": {
+        "empty_wardrobe": true,
+        "acknowledges_no_items": true,
+        "nonempty_outputs": true,
+        "manual_specific_styling_reason": true,
+        "manual_no_invented_ownership": true
+      }
+    },
+    {
+      "criterion": 5,
+      "try": 2,
+      "result": "PASS",
+      "checks": {
+        "empty_wardrobe": true,
+        "acknowledges_no_items": true,
+        "nonempty_outputs": true,
+        "manual_specific_styling_reason": true,
+        "manual_no_invented_ownership": true
+      }
+    },
+    {
+      "criterion": 5,
+      "try": 3,
+      "result": "PASS",
+      "checks": {
+        "empty_wardrobe": true,
+        "acknowledges_no_items": true,
+        "nonempty_outputs": true,
+        "manual_specific_styling_reason": true,
+        "manual_no_invented_ownership": true
+      }
+    },
+    {
+      "criterion": 5,
+      "try": 4,
+      "result": "PASS",
+      "checks": {
+        "empty_wardrobe": true,
+        "acknowledges_no_items": true,
+        "nonempty_outputs": true,
+        "manual_specific_styling_reason": true,
+        "manual_no_invented_ownership": true
+      }
+    },
+    {
+      "criterion": 5,
+      "try": 5,
+      "result": "PASS",
+      "checks": {
+        "empty_wardrobe": true,
+        "acknowledges_no_items": true,
+        "nonempty_outputs": true,
+        "manual_specific_styling_reason": true,
+        "manual_no_invented_ownership": true
+      }
+    }
+  ]
+}
