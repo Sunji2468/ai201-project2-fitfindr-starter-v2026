@@ -13,8 +13,8 @@
 > python app.py ask 'vintage graphic tee under $30'
 > ```
 >
-> All three tools are stubs, so that last command will do nothing useful yet.
-> That's the starting position.
+> The three tools are implemented and tested individually. The agent loop
+> remains a stub until Milestone 5, so the last command still stops there.
 >
 > **The rest of this file is your submission.** Fill it in as you go.
 
@@ -146,8 +146,8 @@ sizes beginning with `One Size` to `One Size`, which only matches a
 - **Returns:** A non-empty `str` containing a two-to-four-sentence caption that mentions the item, its listed price, and its platform once each and describes the outfit's specific style. Use the supplied outfit and listing facts; omit an unknown brand rather than inventing one.
 - **When it has nothing:** For an empty or whitespace-only `outfit`, returns `Cannot create a fit card without an outfit suggestion.` without calling the model. If the model returns blank text, returns `No fit card was generated. Please try again.`
 
-These are contracts for the upcoming implementation; the tools are still
-stubs. Inputs use the dataset shapes above. A model service failure remains
+The tools now implement these contracts; the agent loop is still a stub.
+Inputs use the dataset shapes above. A model service failure remains
 the adapter's `ModelUnavailable` exception, distinct from a valid empty
 wardrobe or blank response; the agent's handler is added in Unit 4.
 
@@ -199,22 +199,79 @@ $ python app.py ask '...'
 
 ```
 
-**The three tools, tested one at a time**
+**The three tools, tested one at a time — Milestone 4**
 
-```
-$ python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
+Run from the repo with `.venv` activated. These are actual terminal outputs.
+The full agent query above is reserved for Milestone 5; no loop is wired yet.
 
+```text
+$ python -c "from tools import search_listings; print(search_listings('graphic tee', size='M', max_price=30)); print('No matches:', search_listings('designer ballgown', size='XXS', max_price=5))"
+[{'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 2000s baby tee with butterfly graphic. Fitted crop length. Tag says medium but fits like a small.', 'category': 'tops', 'style_tags': ['y2k', 'vintage', 'graphic tee', 'cottagecore'], 'size': 'S/M', 'condition': 'excellent', 'price': 18.0, 'colors': ['white', 'pink', 'purple'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_017', 'title': 'Mesh Long-Sleeve Top — Black', 'description': 'Sheer black mesh long-sleeve. Great for layering under a graphic tee or over a bralette. Stretchy material, fits true to size.', 'category': 'tops', 'style_tags': ['y2k', 'grunge', 'goth', 'layering'], 'size': 'S/M', 'condition': 'excellent', 'price': 15.0, 'colors': ['black'], 'brand': None, 'platform': 'depop'}]
+No matches: []
 ```
 
-```
-$ python -c "from tools import suggest_outfit; ..."
+```text
+$ python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, get_empty_wardrobe, load_listings; item = load_listings()[5]; print('With wardrobe:', suggest_outfit(item, get_example_wardrobe())); print('Empty wardrobe:', suggest_outfit(item, get_empty_wardrobe()))"
+With wardrobe: **Outfit 1: Effortless Grunge Streetwear**
+*   Graphic Tee — 2003 Tour Bootleg Style
+*   Baggy straight-leg jeans, dark wash
+*   Black combat boots
+*   Black crossbody bag
 
+**Why it works:** The black-on-dark color palette leans directly into the vintage grunge aesthetic of the tee. Pairing the boxy graphic tee with Baggy straight-leg jeans creates a balanced, relaxed silhouette, while the Black combat boots and Black crossbody bag anchor the outfit with matching dark hardware and textures.
+
+**Outfit 2: Casual Contrast**
+*   Graphic Tee — 2003 Tour Bootleg Style
+*   Wide-leg khaki trousers
+*   Chunky white sneakers
+
+**Why it works:** The tan and khaki tones of the trousers soften the heavy, faded black of the tee, offering an earth-tone contrast that feels modern and intentional. Finishing with Chunky white sneakers ties in the casual streetwear vibe and lightens up the bottom half of the look.
+Empty wardrobe: No wardrobe items were supplied. Here are two ways to style the Graphic Tee — 2003 Tour Bootleg Style:
+
+**Outfit 1: Effortless Grunge**
+Pair the tee with distressed light-wash denim and classic black canvas high-top sneakers. Layer an oversized flannel shirt over top for added texture. The casual, worn-in feel of the vintage-style graphic naturally complements the relaxed aesthetic of ripped jeans and grunge layering pieces.
+
+**Outfit 2: Streetwear Edge**
+Combine the tee with black cargo trousers and chunky leather boots. Add a silver chain necklace and a black leather crossbody bag. The monochrome black palette creates a sleek, cohesive look that lets the faded tour graphic stand out, while the mix of textures adds visual depth.
 ```
 
+```text
+$ python -c "import config; config.CACHE_ENABLED = False; from tools import create_fit_card; from utils.data_loader import load_listings; from generate import usage; item = load_listings()[5]; cards = [create_fit_card('Pair the tee with baggy dark-wash jeans and chunky white sneakers for a relaxed streetwear outfit.', item) for _ in range(3)]; [print(str(i) + ': ' + card) for i, card in enumerate(cards, 1)]; print('Distinct captions:', len(set(cards))); print('Empty outfit:', create_fit_card('   ', item)); print(usage())"
+1: Achieve the ultimate relaxed streetwear aesthetic by styling this vintage-style graphic tee with baggy dark-wash jeans and chunky white sneakers. Grab the piece for $24.0 on depop before it's gone.
+2: Channel a relaxed streetwear vibe by styling this Graphic Tee — 2003 Tour Bootleg Style with baggy dark-wash jeans and chunky white sneakers. This vintage-inspired piece is available now on depop for $24.00 to complete your grunge aesthetic.
+3: Achieve the ultimate relaxed streetwear aesthetic by styling this vintage-style Graphic Tee — 2003 Tour Bootleg Style with baggy dark-wash jeans and chunky white sneakers. This 100% cotton top is currently available on depop for $24.00 to complete your casual grunge look.
+Distinct captions: 3
+Empty outfit: Cannot create a fit card without an outfit suggestion.
+3 model calls this session, 747 prompt + 163 output tokens
 ```
-$ python -c "from tools import create_fit_card; ..."
 
+The caption command temporarily sets `config.CACHE_ENABLED = False` in that
+Python process so all three calls reach the model. The normal cache setting
+remains enabled, and `config.TEMPERATURE` remains `0.9`. All three captions
+were distinct, each used two sentences and included the $24 price and depop
+once. Two began similarly, so different wording does not guarantee a different
+opening style.
+
+Search returned a mesh top because its description contains “graphic tee.”
+This follows the specified keyword-overlap scoring but is a relevance
+limitation. The wardrobe output named supplied pieces, while its mention of
+“matching dark hardware” was not grounded in the wardrobe data; model prose
+still needs review. The empty-wardrobe output explicitly acknowledged that no
+items were supplied and offered general ideas.
+
+Additional local checks:
+
+```text
+$ python -m unittest discover -s tests -v
+Ran 7 tests in 0.003s
+OK
 ```
+
+These checks cover size boundaries, price filtering, empty searches, ranking
+and ties, result limits, empty-outfit handling without a model call, blank
+model responses, and model failure propagation. They are tool-level checks,
+not Unit 4 acceptance evaluations. Milestone 3's user-authored criteria are
+still pending.
 
 ---
 
