@@ -1,0 +1,51 @@
+[
+  {
+    "case": "happy",
+    "args": [
+      "app.py",
+      "ask",
+      "vintage graphic tee under $30",
+      "--trace"
+    ],
+    "output": "[1] parse_query\n      in:  vintage graphic tee under $30\n      out: {'description': 'vintage graphic tee', 'size': None, 'max_price': 30.0}\n[2] search_listings (via MCP)\n      in:  {'description': 'vintage graphic tee', 'size': None, 'max_price': 30.0}\n      out: 10 items: Y2K Baby Tee — Butterfly Print, Graphic Tee — 2003 Tour Bootleg Style, Vintage Band Tee — Faded Grey … +7 more\n[3] select_item\n      in:  first search result\n      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)\n[4] suggest_outfit\n      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…\n      out: **Outfit 1: Y2K Streetwear** Pair the Y2K Baby Tee — Butterfly Print with the Baggy straight-leg jeans, dark w…\n      →    wardrobe items: 10\n[5] create_fit_card\n      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…\n      out: Channel classic early 2000s energy by pairing this Y2K Baby Tee — Butterfly Print with baggy straight-leg jean…\n\n  Found:    Y2K Baby Tee — Butterfly Print — $18.0 on depop\n\n  Outfit:   **Outfit 1: Y2K Streetwear**\nPair the Y2K Baby Tee — Butterfly Print with the Baggy straight-leg jeans, dark wash, Chunky white sneakers, and Black crossbody bag. \n*Why it works:* The fitted crop length of the baby tee balances the loose, relaxed volume of the dark wash straight-leg jeans for a classic early 2000s silhouette, while the white sneakers tie in the white tones of the butterfly graphic.\n\n**Outfit 2: Casual Grunge**\nCombine the Y2K Baby Tee — Butterfly Print with the Wide-leg khaki trousers, Vintage black denim jacket, and Black combat boots.\n*Why it works:* The earthy tan trousers ground the playful pink and purple butterfly print, and layering the slightly cropped black denim jacket with black combat boots adds an edgy contrast to the sweet cottagecore and Y2K aesthetic.\n\n  Fit card: Channel classic early 2000s energy by pairing this Y2K Baby Tee — Butterfly Print with baggy straight-leg jeans, chunky white sneakers, and a black crossbody bag for the ultimate Y2K streetwear vibe. Snag this fitted crop top for $18.00 exclusively on depop to complete your nostalgic look.\n\n0 model calls this session, 2 served from cache\n",
+    "cache_disabled": false,
+    "returncode": 0
+  },
+  {
+    "case": "empty_search",
+    "args": [
+      "app.py",
+      "ask",
+      "designer ballgown size XXS under $5",
+      "--trace"
+    ],
+    "output": "[1] parse_query\n      in:  designer ballgown size XXS under $5\n      out: {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}\n[2] search_listings (via MCP)\n      in:  {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}\n      out: [] (empty)\n      →    branch: empty search; stopping before model tools\n\n  No matching listings. Try broader keywords, a different size, or a higher price limit.\n\n0 model calls this session\n",
+    "cache_disabled": false,
+    "returncode": 0
+  },
+  {
+    "case": "empty_wardrobe",
+    "args": [
+      "app.py",
+      "ask",
+      "vintage graphic tee under $30",
+      "--empty-wardrobe",
+      "--trace"
+    ],
+    "output": "(running with an empty wardrobe)\n[1] parse_query\n      in:  vintage graphic tee under $30\n      out: {'description': 'vintage graphic tee', 'size': None, 'max_price': 30.0}\n[2] search_listings (via MCP)\n      in:  {'description': 'vintage graphic tee', 'size': None, 'max_price': 30.0}\n      out: 10 items: Y2K Baby Tee — Butterfly Print, Graphic Tee — 2003 Tour Bootleg Style, Vintage Band Tee — Faded Grey … +7 more\n[3] select_item\n      in:  first search result\n      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)\n[4] suggest_outfit\n      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…\n      out: No wardrobe items were supplied. Here are a general styling ideas using the Y2K Baby Tee — Butterfly Print:  *…\n      →    wardrobe items: 0\n[5] create_fit_card\n      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…\n      out: Embrace the early 2000s aesthetic by pairing the Y2K Baby Tee — Butterfly Print with low-rise baggy cargo pant…\n\n  Found:    Y2K Baby Tee — Butterfly Print — $18.0 on depop\n\n  Outfit:   No wardrobe items were supplied. Here are a general styling ideas using the Y2K Baby Tee — Butterfly Print:\n\n**Outfit 1: Casual Streetwear**\nPair the baby tee with a pair of low-rise baggy cargo pants and chunky platform sneakers. \n*Why it works:* The fitted, cropped silhouette of the baby tee balances the oversized volume of the cargo pants, while the white, pink, and purple butterfly graphic pops against casual streetwear staples for a classic early 2000s look.\n\n**Outfit 2: Sweet & Retro**\nStyle the top with a pleated denim mini skirt, knee-high white socks, and retro platform sandals, adding a pastel shoulder bag to finish the look.\n*Why it works:* The playful pink and purple tones in the butterfly print tie effortlessly into pastel accessories, and the mini skirt leans into the nostalgic Y2K aesthetic while keeping the outfit light and fun.\n\n  Fit card: Embrace the early 2000s aesthetic by pairing the Y2K Baby Tee — Butterfly Print with low-rise baggy cargo pants and chunky platform sneakers for a casual streetwear vibe. You can find this fitted crop top available on depop for $18.00.\n\n2 model calls this session, 660 prompt + 247 output tokens\n",
+    "cache_disabled": false,
+    "returncode": 0
+  },
+  {
+    "case": "model_unavailable",
+    "args": [
+      "app.py",
+      "ask",
+      "rust corduroy wide-leg pants size W28 under $37.42",
+      "--trace"
+    ],
+    "output": "[1] parse_query\n      in:  rust corduroy wide-leg pants size W28 under $37.42\n      out: {'description': 'rust corduroy wide-leg pants', 'size': 'W28', 'max_price': 37.42}\n[2] search_listings (via MCP)\n      in:  {'description': 'rust corduroy wide-leg pants', 'size': 'W28', 'max_price': 37.42}\n      out: 2 items: Corduroy Wide-Leg Pants — Rust, Straight Leg Black Jeans — Faded\n[3] select_item\n      in:  first search result\n      out: Corduroy Wide-Leg Pants — Rust ($32.0, depop)\n[4] suggest_outfit\n      in:  {'new_item': {'id': 'lst_005', 'title': 'Corduroy Wide-Leg Pants — Rust', 'description': 'Beautiful rust-color…\n      out: The model request failed during suggest_outfit. Check GEMINI_API_KEY in .env and your internet connection, the…\n      →    model unavailable; stopping\n\n  The model request failed during suggest_outfit. Check GEMINI_API_KEY in .env and your internet connection, then retry. If you hit a rate limit, wait a minute before retrying.\n\n1 model calls this session\n",
+    "cache_disabled": true,
+    "returncode": 0
+  }
+]

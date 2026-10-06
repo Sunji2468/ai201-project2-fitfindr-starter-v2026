@@ -75,34 +75,68 @@ def parse_query(query: str) -> dict:
     }
 
 
-def run_agent(query: str, wardrobe: dict) -> dict:
-    """Run search, branch on its result, and pass tool outputs through session state."""
+def run_agent(query: str, wardrobe: dict, *, use_trace: bool = False) -> dict:
+    """Run tools through session state; optionally trace steps and handled failures."""
+    trace.start_trace()
     session = new_session(query, wardrobe)
     session["parsed"] = parse_query(session["query"])
+    if use_trace:
+        trace.step("parse_query", inputs=query, returned=session["parsed"])
     next_step = "search"
     iterations = 0
     while True:
         iterations += 1
         trace.check_iterations(iterations)
         if next_step == "search":
-            session["search_results"] = mcp_client.call_tool("search_listings", session["parsed"])
-            if not session["search_results"]:
-                session["error"] = (
-                    "No matching listings. Try broader keywords, a different size, "
-                    "or a higher price limit."
-                )
-                return session
-            session["selected_item"] = session["search_results"][0]
-            next_step = "outfit"
+            name = "search_listings (via MCP)"
+            inputs = session["parsed"]
         elif next_step == "outfit":
-            session["outfit_suggestion"] = suggest_outfit(
-                session["selected_item"], session["wardrobe"]
-            )
-            next_step = "card"
+            name = "suggest_outfit"
+            inputs = {"new_item": session["selected_item"], "wardrobe": session["wardrobe"]}
         else:
-            session["fit_card"] = create_fit_card(
-                session["outfit_suggestion"], session["selected_item"]
+            name = "create_fit_card"
+            inputs = {"new_item": session["selected_item"], "outfit": session["outfit_suggestion"]}
+        try:
+            if next_step == "search":
+                session["search_results"] = mcp_client.call_tool("search_listings", inputs)
+                result = session["search_results"]
+                if not result:
+                    session["error"] = (
+                        "No matching listings. Try broader keywords, a different size, "
+                        "or a higher price limit."
+                    )
+                    if use_trace:
+                        trace.step(name, inputs=inputs, returned=result,
+                                   note="branch: empty search; stopping before model tools")
+                    return session
+                if use_trace:
+                    trace.step(name, inputs=inputs, returned=result)
+                session["selected_item"] = session["search_results"][0]
+                if use_trace:
+                    trace.step("select_item", inputs="first search result",
+                               returned=session["selected_item"])
+                next_step = "outfit"
+            elif next_step == "outfit":
+                session["outfit_suggestion"] = suggest_outfit(**inputs)
+                if use_trace:
+                    trace.step(name, inputs=inputs, returned=session["outfit_suggestion"],
+                               note=f"wardrobe items: {len(session['wardrobe']['items'])}")
+                next_step = "card"
+            else:
+                session["fit_card"] = create_fit_card(**inputs)
+                if use_trace:
+                    trace.step(name, inputs=inputs, returned=session["fit_card"])
+                return session
+        except ModelUnavailable:
+            # Do not surface raw provider errors, which may contain request details.
+            session["error"] = (
+                f"The model request failed during {name}. Check GEMINI_API_KEY in "
+                ".env and your internet connection, then retry. If you hit a rate "
+                "limit, wait a minute before retrying."
             )
+            if use_trace:
+                trace.step(name, inputs=inputs, returned=session["error"],
+                           note="model unavailable; stopping")
             return session
 
 

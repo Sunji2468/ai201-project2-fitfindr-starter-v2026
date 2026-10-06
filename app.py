@@ -111,7 +111,7 @@ def _ask_one(query, wardrobe, use_trace):
     if use_trace:
         trace_module.start_trace()
 
-    session = run_agent(query, wardrobe)
+    session = run_agent(query, wardrobe, use_trace=use_trace)
 
     print()
     if session["error"]:

@@ -157,7 +157,8 @@ sizes beginning with `One Size` to `One Size`, which only matches a
 The tools and agent loop now implement the contracts and branch below.
 Inputs use the dataset shapes above. A model service failure remains
 the adapter's `ModelUnavailable` exception, distinct from a valid empty
-wardrobe or blank response; the agent's handler is added in Unit 4.
+wardrobe or blank response. The agent now catches it, sets `session["error"]`
+with recovery steps, and returns without calling later tools.
 
 ---
 
@@ -202,6 +203,9 @@ then `parsed` → `search_results` → `selected_item` → `outfit_suggestion` �
 session. The empty-search branch sets `error` and returns with later fields
 still `None`. A loop advances through search, outfit, and card steps and calls
 `trace.check_iterations` before each step to enforce `MAX_ITERATIONS`.
+With `--trace`, parsing, the MCP search, item selection, and both model tools
+are printed through `trace.step()`. A model failure preserves completed state,
+sets `error`, and stops; tracing is silent by default.
 
 ---
 
@@ -447,15 +451,149 @@ that produced it:
 
 **Happy path**
 
-```
+```text
+$ python app.py ask 'vintage graphic tee under $30' --trace
+[1] parse_query
+      in:  vintage graphic tee under $30
+      out: {'description': 'vintage graphic tee', 'size': None, 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': None, 'max_price': 30.0}
+      out: 10 items: Y2K Baby Tee — Butterfly Print, Graphic Tee — 2003 Tour Bootleg Style, Vintage Band Tee — Faded Grey … +7 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: **Outfit 1: Y2K Streetwear** Pair the Y2K Baby Tee — Butterfly Print with the Baggy straight-leg jeans, dark w…
+      →    wardrobe items: 10
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Channel classic early 2000s energy by pairing this Y2K Baby Tee — Butterfly Print with baggy straight-leg jean…
 
+  Found:    Y2K Baby Tee — Butterfly Print — $18.0 on depop
+
+  Outfit:   **Outfit 1: Y2K Streetwear**
+Pair the Y2K Baby Tee — Butterfly Print with the Baggy straight-leg jeans, dark wash, Chunky white sneakers, and Black crossbody bag.
+*Why it works:* The fitted crop length of the baby tee balances the loose, relaxed volume of the dark wash straight-leg jeans for a classic early 2000s silhouette, while the white sneakers tie in the white tones of the butterfly graphic.
+
+**Outfit 2: Casual Grunge**
+Combine the Y2K Baby Tee — Butterfly Print with the Wide-leg khaki trousers, Vintage black denim jacket, and Black combat boots.
+*Why it works:* The earthy tan trousers ground the playful pink and purple butterfly print, and layering the slightly cropped black denim jacket with black combat boots adds an edgy contrast to the sweet cottagecore and Y2K aesthetic.
+
+  Fit card: Channel classic early 2000s energy by pairing this Y2K Baby Tee — Butterfly Print with baggy straight-leg jeans, chunky white sneakers, and a black crossbody bag for the ultimate Y2K streetwear vibe. Snag this fitted crop top for $18.00 exclusively on depop to complete your nostalgic look.
+
+0 model calls this session, 2 served from cache
 ```
 
 **Empty search**
 
+```text
+$ python app.py ask 'designer ballgown size XXS under $5' --trace
+[1] parse_query
+      in:  designer ballgown size XXS under $5
+      out: {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+      out: [] (empty)
+      →    branch: empty search; stopping before model tools
+
+  No matching listings. Try broader keywords, a different size, or a higher price limit.
+
+0 model calls this session
 ```
 
+**Empty wardrobe**
+
+```text
+$ python app.py ask 'vintage graphic tee under $30' --empty-wardrobe --trace
+(running with an empty wardrobe)
+[1] parse_query
+      in:  vintage graphic tee under $30
+      out: {'description': 'vintage graphic tee', 'size': None, 'max_price': 30.0}
+[2] search_listings (via MCP)
+      in:  {'description': 'vintage graphic tee', 'size': None, 'max_price': 30.0}
+      out: 10 items: Y2K Baby Tee — Butterfly Print, Graphic Tee — 2003 Tour Bootleg Style, Vintage Band Tee — Faded Grey … +7 more
+[3] select_item
+      in:  first search result
+      out: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: No wardrobe items were supplied. Here are a general styling ideas using the Y2K Baby Tee — Butterfly Print:  *…
+      →    wardrobe items: 0
+[5] create_fit_card
+      in:  {'new_item': {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 200…
+      out: Embrace the early 2000s aesthetic by pairing the Y2K Baby Tee — Butterfly Print with low-rise baggy cargo pant…
+
+  Found:    Y2K Baby Tee — Butterfly Print — $18.0 on depop
+
+  Outfit:   No wardrobe items were supplied. Here are a general styling ideas using the Y2K Baby Tee — Butterfly Print:
+
+**Outfit 1: Casual Streetwear**
+Pair the baby tee with a pair of low-rise baggy cargo pants and chunky platform sneakers.
+*Why it works:* The fitted, cropped silhouette of the baby tee balances the oversized volume of the cargo pants, while the white, pink, and purple butterfly graphic pops against casual streetwear staples for a classic early 2000s look.
+
+**Outfit 2: Sweet & Retro**
+Style the top with a pleated denim mini skirt, knee-high white socks, and retro platform sandals, adding a pastel shoulder bag to finish the look.
+*Why it works:* The playful pink and purple tones in the butterfly print tie effortlessly into pastel accessories, and the mini skirt leans into the nostalgic Y2K aesthetic while keeping the outfit light and fun.
+
+  Fit card: Embrace the early 2000s aesthetic by pairing the Y2K Baby Tee — Butterfly Print with low-rise baggy cargo pants and chunky platform sneakers for a casual streetwear vibe. You can find this fitted crop top available on depop for $18.00.
+
+2 model calls this session, 660 prompt + 247 output tokens
 ```
+
+**Model unavailable**
+
+One character of the key was changed only in the child process environment;
+`AI201_CACHE=0` forced a real request. The saved `.env` was never edited, and
+the script verified its bytes were unchanged. Neither key value was logged.
+The command below ran inside that temporary environment.
+
+```text
+$ python app.py ask 'rust corduroy wide-leg pants size W28 under $37.42' --trace
+[1] parse_query
+      in:  rust corduroy wide-leg pants size W28 under $37.42
+      out: {'description': 'rust corduroy wide-leg pants', 'size': 'W28', 'max_price': 37.42}
+[2] search_listings (via MCP)
+      in:  {'description': 'rust corduroy wide-leg pants', 'size': 'W28', 'max_price': 37.42}
+      out: 2 items: Corduroy Wide-Leg Pants — Rust, Straight Leg Black Jeans — Faded
+[3] select_item
+      in:  first search result
+      out: Corduroy Wide-Leg Pants — Rust ($32.0, depop)
+[4] suggest_outfit
+      in:  {'new_item': {'id': 'lst_005', 'title': 'Corduroy Wide-Leg Pants — Rust', 'description': 'Beautiful rust-color…
+      out: The model request failed during suggest_outfit. Check GEMINI_API_KEY in .env and your internet connection, the…
+      →    model unavailable; stopping
+
+  The model request failed during suggest_outfit. Check GEMINI_API_KEY in .env and your internet connection, then retry. If you hit a rate limit, wait a minute before retrying.
+
+1 model calls this session
+```
+
+**What changed and what these checks show**
+
+`agent.py::run_agent` catches `ModelUnavailable` at either model tool and
+returns an actionable error in the session instead of a raw traceback. It
+keeps completed search/selection data and any completed outfit suggestion;
+`fit_card` remains `None` on model failure. `app.py` passes the trace option
+into the agent. `trace.py` now shows values for general dictionaries instead
+of only key names; long inputs and outputs are still abbreviated.
+
+Reproduce these cases with `python scripts/check_failure_modes.py`. The script
+uses the real CLI and MCP server, changes the key only for the bad-key child
+process, and writes [results/unit4_failure_checks.json](results/unit4_failure_checks.json).
+It checks for successful process exits and no raw traceback. The recorded
+happy path reused two model responses; empty wardrobe made two real requests;
+the bad-key case made one real request with caching disabled. These are
+failure probes, not the five-try acceptance evaluation.
+
+All 17 local tests passed, including failures at either model step, retained
+session state, trace reset, default silence, and the shorter empty-search path.
+
+**Reading the messages as a user (AI review):**
+
+- Empty search: I would use broader keywords, choose a different size, or raise the price ceiling. The message names all three options.
+- Empty wardrobe: I would try the proposed combinations or supply my actual wardrobe for more specific advice. The output acknowledges that no items were supplied and gives useful general suggestions.
+- Model unavailable: I would check the key in `.env` and my connection, then retry; if rate-limited, I would wait a minute. The message identifies the failed model step and gives actions, though it does not distinguish the precise provider failure.
 
 **On the MCP move — Unit 4, Milestone 1:** Only `search_listings` is
 registered with FastMCP in `mcp_server.py`. Its wrapper delegates to the
@@ -519,7 +657,8 @@ $ python app.py ask 'designer ballgown size XXS under $5'
 ```
 
 The MCP move succeeded with no observed return-value differences. Trace
-instrumentation and repeated uncached acceptance runs remain later milestones.
+instrumentation and the three failure probes are now recorded above; repeated
+uncached acceptance runs remain a later milestone.
 
 
 ---
